@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
@@ -43,11 +43,13 @@ const PlayerList = () => {
     ];
 
     return (
-        <Box m="20px">
+        <>
             <Header title="PLAYERS" subtitle="Managing the players" />
             <Box
-                m="40px 0 0 0"
-                height="70vh"
+                my={2}
+                height="auto"
+                boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
+                backgroundColor="background.paper"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none"
@@ -63,18 +65,42 @@ const PlayerList = () => {
                     },
                 }}
             >
-                {
-                    !isLoading &&
-                    <DataGrid
-                        rows={players}
-                        columns={columns}
-                        getRowId={(row) => row.player_id}
-                        components={{ Toolbar: GridToolbar }}
-                    />
-                }
+
+                <Box
+                    px={3}
+                    py={2}
+                    backgroundColor="primary.dark"
+                >
+                    <Typography variant="h3" fontWeight="bold">
+                        Player List
+                    </Typography>
+                </Box>
+
+                <Box
+                    p={3}
+                >
+                    {
+                        !isLoading ?
+                            (
+                                <DataGrid
+                                    rows={players}
+                                    columns={columns}
+                                    getRowId={(row) => row.player_id}
+                                    components={{ Toolbar: GridToolbar }}
+                                    sx={{ height: "70vh" }}
+                                />) : (
+                                <DataGrid
+                                    loading
+                                    rows={[]}
+                                    columns={columns}
+                                    sx={{ height: "70vh" }}
+                                />
+                            )
+                    }
+                </Box>
 
             </Box>
-        </Box>
+        </>
     );
 }
 

@@ -18,17 +18,19 @@ const App = () => {
 
           <Box
             display="flex"
-            position="relative"
-            height="100%"
-            width="100%"
           >
             <Sidebar />
-            <Box height="100%" width="100%">
+            <Box width="100%">
               <Topbar />
-              <Routes>
-                <Route path="/players" element={<PlayerList />} />
-                <Route path="/players/:id" element={<PlayerInfo />} />
-              </Routes>
+              <Box
+                px={5}
+                py={1}
+              >
+                <Routes>
+                  <Route path="/players" element={<PlayerList />} />
+                  <Route path="/players/:id" element={<PlayerInfo />} />
+                </Routes>
+              </Box>
             </Box>
           </Box>
 
