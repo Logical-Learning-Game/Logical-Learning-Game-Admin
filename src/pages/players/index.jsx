@@ -1,30 +1,21 @@
 import { Box, Button, Stack } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
+import { useQuery } from "react-query";
+import { fetchPlayerData } from "../../api/fetchData";
 
-const mockPlayers = [
-    {
-        player_id: "testfdskjflkds",
-        email: "test@email.com",
-        name: "Patpum Hakaew"
-    },
-];
 
-for (let i = 0; i < 25; i++) {
-    mockPlayers.push({
-        player_id: "testfdskjflkds",
-        email: "test@email.com",
-        name: "Patpum Hakaew"
-    });
-}
+const PlayerList = () => {
+    const { data: players, isLoading } = useQuery("playerData", fetchPlayerData);
 
-const Players = () => {
     const columns = [
         {
             field: "player_id",
-            headerName: "ID"
+            headerName: "ID",
+            flex: 1
         },
         {
             field: "email",
@@ -43,8 +34,8 @@ const Players = () => {
             renderCell: (row) => {
                 return (
                     <Stack direction="row" spacing={2}>
-                        <Button variant="contained" color="primary" startIcon={<BarChartOutlinedIcon/>} onClick={() => console.log("info click")}>Info</Button>
-                        <Button variant="contained" color="primary" startIcon={<VideogameAssetOutlinedIcon/>} onClick={() => console.log("maps click")}>Maps</Button>
+                        <Button component={Link} to={`/players/${row.id}`} variant="contained" color="primary" startIcon={<BarChartOutlinedIcon />} onClick={() => console.log("info click")}>Info</Button>
+                        <Button component={Link} to={`/players/${row.id}/maps`} variant="contained" color="primary" startIcon={<VideogameAssetOutlinedIcon />} onClick={() => console.log("maps click")}>Maps</Button>
                     </Stack>
                 );
             }
@@ -72,15 +63,19 @@ const Players = () => {
                     },
                 }}
             >
-                <DataGrid
-                    rows={mockPlayers}
-                    columns={columns}
-                    getRowId={(row) => row.player_id}
-                    components={{ Toolbar: GridToolbar }}
-                />
+                {
+                    !isLoading &&
+                    <DataGrid
+                        rows={players}
+                        columns={columns}
+                        getRowId={(row) => row.player_id}
+                        components={{ Toolbar: GridToolbar }}
+                    />
+                }
+
             </Box>
         </Box>
     );
 }
 
-export default Players;
+export default PlayerList;

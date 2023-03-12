@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { Link } from "react-router-dom";
 import VideogameAssetOutlinedIcon from "@mui/icons-material/VideogameAssetOutlined";
@@ -24,14 +23,14 @@ const Sidebar = () => {
             anchor="left"
         >
             <Box p={2} textAlign="center">
-                <Typography variant="h3">
+                <Typography variant="h3" fontWeight="bold">
                     Logical Learning Game Admin
                 </Typography>
             </Box>
 
             <List>
                 <ListItem disablePadding>
-                    <ListItemButton>
+                    <ListItemButton component={Link} to="/players">
                         <ListItemIcon>
                             <PeopleOutlinedIcon sx={{ color: "primary.main" }} />
                         </ListItemIcon>
