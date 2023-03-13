@@ -3,15 +3,15 @@ import { Typography, Box } from "@mui/material";
 const Header = ({ title, subtitle }) => {
 
     return (
-        <Box mb="30px">
+        <Box mb={3}>
             <Typography
-                variant="h2" 
+                variant="h4" 
                 fontWeight="bold" 
-                sx={{ mb: "5px" }}
+                sx={{ mb: 1 }}
             >
                 {title}
             </Typography>
-            <Typography variant="h5" color="secondary.light">{subtitle}</Typography>
+            <Typography variant="subtitle1" color="secondary.light">{subtitle}</Typography>
         </Box>
     );
 };

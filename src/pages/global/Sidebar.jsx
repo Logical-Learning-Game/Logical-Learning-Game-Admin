@@ -23,7 +23,7 @@ const Sidebar = () => {
             anchor="left"
         >
             <Box p={2} textAlign="center">
-                <Typography variant="h3" fontWeight="bold">
+                <Typography variant="h5" fontWeight="bold">
                     Logical Learning Game Admin
                 </Typography>
             </Box>
@@ -34,7 +34,7 @@ const Sidebar = () => {
                         <ListItemIcon>
                             <PeopleOutlinedIcon sx={{ color: "primary.main" }} />
                         </ListItemIcon>
-                        <ListItemText primary="Player Management" />
+                        <ListItemText primary="Player Management" primaryTypographyProps={{variant: "body2", fontWeight: "medium"}} />
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
@@ -42,7 +42,7 @@ const Sidebar = () => {
                         <ListItemIcon>
                             <VideogameAssetOutlinedIcon sx={{ color: "primary.main" }} />
                         </ListItemIcon>
-                        <ListItemText primary="Map Management" />
+                        <ListItemText primary="Map Management" primaryTypographyProps={{variant: "body2", fontWeight: "medium"}} />
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
@@ -50,7 +50,7 @@ const Sidebar = () => {
                         <ListItemIcon>
                             <ConstructionOutlinedIcon sx={{ color: "primary.main" }} />
                         </ListItemIcon>
-                        <ListItemText primary="Map Builder" />
+                        <ListItemText primary="Map Builder" primaryTypographyProps={{variant: "body2", fontWeight: "medium"}} />
                     </ListItemButton>
                 </ListItem>
             </List>

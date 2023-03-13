@@ -9,7 +9,7 @@ import { fetchPlayerData } from "../../api/fetchData";
 
 
 const PlayerList = () => {
-    const { data: players, isLoading } = useQuery("playerData", fetchPlayerData);
+    const { data: players, isLoading } = useQuery("playerData", fetchPlayerData());
 
     const columns = [
         {
@@ -31,11 +31,30 @@ const PlayerList = () => {
             field: "actions",
             headerName: "Actions",
             flex: 1,
-            renderCell: (row) => {
+            renderCell: (data) => {
                 return (
                     <Stack direction="row" spacing={2}>
-                        <Button component={Link} to={`/players/${row.id}`} variant="contained" color="primary" startIcon={<BarChartOutlinedIcon />} onClick={() => console.log("info click")}>Info</Button>
-                        <Button component={Link} to={`/players/${row.id}/maps`} variant="contained" color="primary" startIcon={<VideogameAssetOutlinedIcon />} onClick={() => console.log("maps click")}>Maps</Button>
+                        <Button
+                            component={Link}
+                            to={`/players/${data.id}`}
+                            state={data.row}
+                            variant="contained" color="primary"
+                            startIcon={<BarChartOutlinedIcon />}
+                            onClick={() => console.log("info click")}
+                            size="small"
+                        >
+                            Info
+                        </Button>
+                        <Button
+                            component={Link}
+                            to={`/players/${data.id}/maps`}
+                            variant="contained" color="primary"
+                            startIcon={<VideogameAssetOutlinedIcon />}
+                            onClick={() => console.log("maps click")}
+                            size="small"
+                        >
+                            Maps
+                        </Button>
                     </Stack>
                 );
             }
@@ -51,9 +70,6 @@ const PlayerList = () => {
                 boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
                 backgroundColor="background.paper"
                 sx={{
-                    "& .MuiDataGrid-root": {
-                        border: "none"
-                    },
                     "& .MuiDataGrid-columnHeaders": {
                         backgroundColor: "background.paper",
                     },
@@ -71,7 +87,7 @@ const PlayerList = () => {
                     py={2}
                     backgroundColor="primary.dark"
                 >
-                    <Typography variant="h3" fontWeight="bold">
+                    <Typography variant="h5" fontWeight="bold">
                         Player List
                     </Typography>
                 </Box>
@@ -87,13 +103,14 @@ const PlayerList = () => {
                                     columns={columns}
                                     getRowId={(row) => row.player_id}
                                     components={{ Toolbar: GridToolbar }}
-                                    sx={{ height: "70vh" }}
+                                    sx={{ height: "70vh", border: "none" }}
                                 />) : (
                                 <DataGrid
                                     loading
                                     rows={[]}
                                     columns={columns}
-                                    sx={{ height: "70vh" }}
+                                    components={{ Toolbar: GridToolbar }}
+                                    sx={{ height: "70vh", border: "none" }}
                                 />
                             )
                     }
