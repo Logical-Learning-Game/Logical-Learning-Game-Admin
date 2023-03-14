@@ -1,42 +1,34 @@
 import { ThemeProvider, CssBaseline, Box } from "@mui/material";
 import { theme } from "./theme";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from 'react-query'
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Outlet } from "react-router-dom";
+import { queryClient } from "./queryClient";
 import Sidebar from "./pages/global/Sidebar";
 import Topbar from "./pages/global/Topbar";
-import PlayerList from "./pages/players";
-import PlayerInfo from "./pages/players/PlayerInfo";
-
-const queryClient = new QueryClient();
 
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
 
-          <Box
-            display="flex"
-          >
-            <Sidebar />
-            <Box width="100%">
-              <Topbar />
-              <Box
-                px={5}
-                py={1}
-              >
-                <Routes>
-                  <Route path="/players" element={<PlayerList />} />
-                  <Route path="/players/:id" element={<PlayerInfo />} />
-                </Routes>
-              </Box>
+        <Box
+          display="flex"
+        >
+          <Sidebar />
+          <Box width="100%">
+            <Topbar />
+            <Box
+              px={5}
+              py={1}
+            >
+              <Outlet />
             </Box>
           </Box>
+        </Box>
 
-        </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider >
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,15 +1,28 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchPlayerData } from "../../api/fetchData";
+import DataBox from "../../components/DataBox";
 
+const playerListQuery = () => ({
+    queryKey: ["playerList"],
+    queryFn: fetchPlayerData()
+});
+
+export const loader = (queryClient) => {
+    return async ({ params }) => {
+        const query = playerListQuery();
+        const data = await queryClient.ensureQueryData(query);
+        return data;
+    }
+};
 
 const PlayerList = () => {
-    const { data: players, isLoading } = useQuery("playerData", fetchPlayerData());
+    const { data: players, isLoading } = useQuery(playerListQuery());
 
     const columns = [
         {
@@ -36,7 +49,7 @@ const PlayerList = () => {
                     <Stack direction="row" spacing={2}>
                         <Button
                             component={Link}
-                            to={`/players/${data.id}`}
+                            to={`${data.id}`}
                             state={data.row}
                             variant="contained" color="primary"
                             startIcon={<BarChartOutlinedIcon />}
@@ -47,7 +60,7 @@ const PlayerList = () => {
                         </Button>
                         <Button
                             component={Link}
-                            to={`/players/${data.id}/maps`}
+                            to={`${data.id}/maps`}
                             variant="contained" color="primary"
                             startIcon={<VideogameAssetOutlinedIcon />}
                             onClick={() => console.log("maps click")}
@@ -64,11 +77,9 @@ const PlayerList = () => {
     return (
         <>
             <Header title="PLAYERS" subtitle="Managing the players" />
-            <Box
-                my={2}
-                height="auto"
-                boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
-                backgroundColor="background.paper"
+
+            <DataBox
+                title="Player List"
                 sx={{
                     "& .MuiDataGrid-columnHeaders": {
                         backgroundColor: "background.paper",
@@ -80,45 +91,28 @@ const PlayerList = () => {
                         backgroundColor: "background.paper"
                     },
                 }}
-            >
-
-                <Box
-                    px={3}
-                    py={2}
-                    backgroundColor="primary.dark"
-                >
-                    <Typography variant="h5" fontWeight="bold">
-                        Player List
-                    </Typography>
-                </Box>
-
-                <Box
-                    p={3}
-                >
-                    {
-                        !isLoading ?
-                            (
-                                <DataGrid
-                                    rows={players}
-                                    columns={columns}
-                                    getRowId={(row) => row.player_id}
-                                    components={{ Toolbar: GridToolbar }}
-                                    sx={{ height: "70vh", border: "none" }}
-                                />) : (
-                                <DataGrid
-                                    loading
-                                    rows={[]}
-                                    columns={columns}
-                                    components={{ Toolbar: GridToolbar }}
-                                    sx={{ height: "70vh", border: "none" }}
-                                />
-                            )
-                    }
-                </Box>
-
-            </Box>
+                contentComponent={
+                    !isLoading ?
+                        (
+                            <DataGrid
+                                rows={players}
+                                columns={columns}
+                                getRowId={(row) => row.player_id}
+                                components={{ Toolbar: GridToolbar }}
+                                sx={{ height: "70vh", border: "none" }}
+                            />) : (
+                            <DataGrid
+                                loading
+                                rows={[]}
+                                columns={columns}
+                                components={{ Toolbar: GridToolbar }}
+                                sx={{ height: "70vh", border: "none" }}
+                            />
+                        )
+                }
+            />
         </>
     );
-}
+};
 
 export default PlayerList;

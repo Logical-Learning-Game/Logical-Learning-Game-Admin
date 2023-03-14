@@ -1,28 +1,35 @@
-import { Box, Typography, Divider, List, ListItem, ListItemText, ListItemIcon, Button } from "@mui/material";
+import { List, ListItem, ListItemText, ListItemIcon, Button, Grid } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Header from "../../components/Header";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPlayerSessionData } from "../../api/fetchData";
+import DataBox from "../../components/DataBox";
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import AbcOutlinedIcon from '@mui/icons-material/AbcOutlined';
-import { useQuery } from "react-query";
-import { fetchPlayerSessionData } from "../../api/fetchData";
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+
+const playerSessionQuery = (playerId) => ({
+    queryKey: ["playerSessions", playerId],
+    queryFn: fetchPlayerSessionData(playerId)
+});
+
+export const loader = (queryClient) => {
+    return async ({ params }) => {
+        const query = playerSessionQuery(params.playerId);
+        const data = await queryClient.ensureQueryData(query);
+        return data;
+    };
+};
 
 const PlayerInfo = () => {
-    const { id } = useParams();
+    const { playerId } = useParams();
     const { state } = useLocation();
 
-    const { data: sessions, isLoading } = useQuery("playerSessionData", fetchPlayerSessionData(id), {
-        select: (sessions) => {
-            return sessions.map(({start_datetime, end_datetime, ...other}) => ({
-                start_datetime: new Date(start_datetime),
-                end_datetime: new Date(end_datetime),
-                ...other
-            }));
-        }
-    });
+    const { data: sessions, isLoading } = useQuery(playerSessionQuery(playerId));
 
-    const columns = [
+    const sessionHistoryColumns = [
         {
             field: "world_name",
             headerName: "World",
@@ -35,16 +42,18 @@ const PlayerInfo = () => {
         },
         {
             field: "start_datetime",
-            headerName: "Start Datetime",
+            headerName: "Start Date/Time",
             type: "date",
-            valueFormatter: (params) => new Date(params.value).toLocaleString("en-GB"),
+            valueGetter: (params) => new Date(params.value),
+            valueFormatter: (params) => params.value.toLocaleString("en-GB"),
             flex: 1
         },
         {
             field: "end_datetime",
-            headerName: "End Datetime",
+            headerName: "End Date/Time",
             type: "date",
-            valueFormatter: (params) => new Date(params.value).toLocaleString("en-GB"),
+            valueGetter: (params) => new Date(params.value),
+            valueFormatter: (params) => params.value.toLocaleString("en-GB"),
             flex: 1
         },
         {
@@ -53,7 +62,13 @@ const PlayerInfo = () => {
             flex: 1,
             renderCell: (data) => {
                 return (
-                    <Button variant="contained" size="small">
+                    <Button
+                        component={Link}
+                        to={`sessions/${data.id}`}
+                        variant="contained"
+                        size="small"
+                        startIcon={<PageviewOutlinedIcon />}
+                    >
                         View
                     </Button>
                 );
@@ -61,161 +76,164 @@ const PlayerInfo = () => {
         }
     ];
 
+    const signInHistoryColumns = [
+        {
+            field: "sign_in_datetime",
+            headerName: "Date/Time",
+            type: "date",
+            valueGetter: (params) => new Date(params.value),
+            valueFormatter: (params) => params.value.toLocaleString("en-GB"),
+            flex: 6,
+            headerAlign: "center",
+            align: "center"
+        }
+    ];
+
+    const mockSignInHistoryData = [
+        {
+            id: 1,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 2,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 3,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 4,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 4,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 4,
+            sign_in_datetime: new Date()
+        },
+        {
+            id: 4,
+            sign_in_datetime: new Date()
+        },
+    ];
+
     return (
         <>
             <Header title="PLAYER INFO" subtitle="Player information" />
 
-            {/* DETAIL */}
-            <Box
-                my={2}
-                height="auto"
-                boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
-                backgroundColor="background.paper"
-            >
-                <Box
-                    px={3}
-                    py={2}
-                    backgroundColor="primary.dark"
-                >
-                    <Typography variant="h5" fontWeight="bold">
-                        Detail
-                    </Typography>
-                </Box>
-
-                <Box
-                >
-                    <List
-                        sx={{ p: 3 }}
-                    >
-                        <ListItem disableGutters>
-                            <ListItemIcon>
-                                <PersonOutlinedIcon color="primary" />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary="Player ID"
-                                secondary={state.player_id}
-                            />
-                        </ListItem>
-                        <ListItem disableGutters>
-                            <ListItemIcon>
-                                <EmailOutlinedIcon color="primary" />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary="Email"
-                                secondary={state.email}
-                            />
-                        </ListItem>
-                        <ListItem disableGutters>
-                            <ListItemIcon>
-                                <AbcOutlinedIcon color="primary" />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary="Name"
-                                secondary={state.name}
-                            />
-                        </ListItem>
-                    </List>
-                </Box>
-            </Box>
-
-            <Divider variant="middle" />
-
-            {/* SESSION HISTORIES */}
-            <Box
-                my={2}
-                height="auto"
-                boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
-                backgroundColor="background.paper"
-                sx={{
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: "background.paper",
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        backgroundColor: "background.paper"
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: "background.paper"
-                    },
-                }}
-            >
-                <Box
-                    px={3}
-                    py={2}
-                    backgroundColor="primary.dark"
-                >
-                    <Typography variant="h5" fontWeight="bold">
-                        Session Histories
-                    </Typography>
-                </Box>
-
-                <Box
-                    p={3}
-                >
-                    {
-                        !isLoading ? (
-                            <DataGrid
-                                rows={sessions}
-                                columns={columns}
-                                getRowId={(row) => row.session_id}
-                                components={{ Toolbar: GridToolbar }}
-                                sx={{ height: "70vh", border: "none" }}
-                            />) : (
-                            <DataGrid
-                                loading
-                                rows={[]}
-                                columns={columns}
-                                getRowId={(row) => row.session_id}
-                                components={{ Toolbar: GridToolbar }}
-                                sx={{ height: "70vh", border: "none" }}
-                            />
-                        )
-                    }
-
-                </Box>
-            </Box>
-
-            <Divider variant="middle" />
-
-            {/* SIGNIN HISTORIES */}
-            <Box
-                my={2}
-                height="auto"
-                boxShadow="0px 2px 4px 0 rgba(0, 0, 0, 0.2)"
-                backgroundColor="background.paper"
-                sx={{
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: "background.paper",
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        backgroundColor: "background.paper"
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: "background.paper"
-                    },
-                }}
-            >
-                <Box
-                    px={3}
-                    py={2}
-                    backgroundColor="primary.dark"
-                >
-                    <Typography variant="h5" fontWeight="bold">
-                        Sign In Histories
-                    </Typography>
-                </Box>
-
-                <Box
-                    p={3}
-                >
-                    <DataGrid
-                        rows={[]}
-                        columns={columns}
-                        components={{ Toolbar: GridToolbar }}
-                        sx={{ height: "70vh", border: "none" }}
+            <Grid container spacing={2} mb={2}>
+                <Grid item md={6}>
+                    {/* DETAIL */}
+                    <DataBox
+                        disableContentPadding
+                        title="Detail"
+                        sx={{
+                            height: "400px"
+                        }}
+                        contentComponent={
+                            <List
+                                sx={{ p: 3 }}
+                            >
+                                <ListItem disableGutters>
+                                    <ListItemIcon>
+                                        <PersonOutlinedIcon color="primary" />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary="Player ID"
+                                        secondary={state.player_id}
+                                    />
+                                </ListItem>
+                                <ListItem disableGutters>
+                                    <ListItemIcon>
+                                        <EmailOutlinedIcon color="primary" />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary="Email"
+                                        secondary={state.email}
+                                    />
+                                </ListItem>
+                                <ListItem disableGutters>
+                                    <ListItemIcon>
+                                        <AbcOutlinedIcon color="primary" />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary="Name"
+                                        secondary={state.name}
+                                    />
+                                </ListItem>
+                            </List>
+                        }
                     />
-                </Box>
-            </Box>
+                </Grid>
+                <Grid item md={6}>
+                    {/* SIGNIN HISTORIES */}
 
+                    <DataBox
+                        title="Sign In Histories"
+                        sx={{
+                            "& .MuiDataGrid-columnHeaders": {
+                                backgroundColor: "background.paper",
+                            },
+                            "& .MuiDataGrid-footerContainer": {
+                                backgroundColor: "background.paper"
+                            },
+                            "& .MuiDataGrid-virtualScroller": {
+                                backgroundColor: "background.paper"
+                            },
+                            height: "400px"
+                        }}
+                        contentComponent={
+                            <DataGrid
+                                rows={mockSignInHistoryData}
+                                columns={signInHistoryColumns}
+                                getRowId={(idx, row) => idx}
+                                autoPageSize
+                                sx={{ height: "300px", border: "none" }}
+                            />
+                        }
+                    />
+                </Grid>
+                <Grid item md={12}>
+                    {/* SESSION HISTORIES */}
+                    <DataBox
+                        title="Session Histories"
+                        sx={{
+                            "& .MuiDataGrid-columnHeaders": {
+                                backgroundColor: "background.paper",
+                            },
+                            "& .MuiDataGrid-footerContainer": {
+                                backgroundColor: "background.paper"
+                            },
+                            "& .MuiDataGrid-virtualScroller": {
+                                backgroundColor: "background.paper"
+                            },
+                        }}
+                        contentComponent={
+                            !isLoading ? (
+                                <DataGrid
+                                    rows={sessions}
+                                    columns={sessionHistoryColumns}
+                                    getRowId={(row) => row.session_id}
+                                    components={{ Toolbar: GridToolbar }}
+                                    autoPageSize
+                                    sx={{ height: "70vh", border: "none" }}
+                                />) : (
+                                <DataGrid
+                                    loading
+                                    rows={[]}
+                                    columns={sessionHistoryColumns}
+                                    getRowId={(row) => row.session_id}
+                                    components={{ Toolbar: GridToolbar }}
+                                    sx={{ height: "70vh", border: "none" }}
+                                />
+                            )
+                        }
+                    />
+                </Grid>
+            </Grid>
         </>
     )
 }
