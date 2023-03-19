@@ -38,7 +38,7 @@ const Sidebar = () => {
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>
-                    <ListItemButton>
+                    <ListItemButton component={Link} to="/maps">
                         <ListItemIcon>
                             <VideogameAssetOutlinedIcon sx={{ color: "primary.main" }} />
                         </ListItemIcon>

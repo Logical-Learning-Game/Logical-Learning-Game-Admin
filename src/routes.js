@@ -2,8 +2,10 @@ import { createBrowserRouter } from "react-router-dom";
 import { queryClient } from "./queryClient";
 import PlayerList, { loader as playerListLoader } from "./pages/players";
 import PlayerInfo, { loader as playerInfoLoader } from "./pages/players/PlayerInfo";
-import SessionInfo, {loader as sessionInfoLoader} from "./pages/players/SessionInfo";
+import SessionInfo from "./pages/players/SessionInfo";
+import MapList, {loader as mapListLoader} from "./pages/maps";
 import App from "./App";
+import TopSubmitInfo from "./pages/players/TopSubmitInfo";
 
 export const router = createBrowserRouter([
     {
@@ -22,8 +24,16 @@ export const router = createBrowserRouter([
             },
             {
                 path: "players/:playerId/sessions/:sessionId",
-                element: <SessionInfo/>,
-                loader: sessionInfoLoader(queryClient)
+                element: <SessionInfo/>
+            },
+            {
+                path: "players/:playerId/map/:mapForPlayerId/top_submit",
+                element: <TopSubmitInfo/>
+            },
+            {
+                path: "maps",
+                element: <MapList/>,
+                loader: mapListLoader(queryClient)
             }
         ]
     }

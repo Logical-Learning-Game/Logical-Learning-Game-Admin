@@ -5,24 +5,21 @@ import Header from "../../components/Header";
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
 import { useQuery } from "@tanstack/react-query";
-import { fetchPlayerData } from "../../api/fetchData";
+import { playerListQueryOption } from "../../api/fetchData";
 import DataBox from "../../components/DataBox";
 
-const playerListQuery = () => ({
-    queryKey: ["playerList"],
-    queryFn: fetchPlayerData()
-});
+
 
 export const loader = (queryClient) => {
     return async ({ params }) => {
-        const query = playerListQuery();
+        const query = playerListQueryOption();
         const data = await queryClient.ensureQueryData(query);
         return data;
     }
 };
 
 const PlayerList = () => {
-    const { data: players, isLoading } = useQuery(playerListQuery());
+    const { data: players, isLoading } = useQuery(playerListQueryOption());
 
     const columns = [
         {

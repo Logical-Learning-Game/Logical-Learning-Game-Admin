@@ -21,6 +21,7 @@ const App = () => {
             <Box
               px={5}
               py={1}
+              mb={2}
             >
               <Outlet />
             </Box>

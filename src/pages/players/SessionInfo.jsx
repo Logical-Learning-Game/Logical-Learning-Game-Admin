@@ -1,114 +1,152 @@
-import { Box, Grid, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Grid, List, ListItem, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { fetchSubmitHistoryData } from "../../api/fetchData";
-import { useQuery } from "@tanstack/react-query";
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import { useLocation } from "react-router-dom";
+import { useMemo, useState } from "react";
 import DataBox from "../../components/DataBox";
 import Header from "../../components/Header";
-import { useParams } from "react-router-dom";
+import { toAdjacencyList, commandDisplay } from "../../utils/command";
+import { ruleDisplay } from "../../utils/rule";
 
-const submithistoryQuery = (sessionId) => ({
-  queryKey: ["submitHistories", sessionId],
-  queryFn: fetchSubmitHistoryData(sessionId)
-});
 
-export const loader = (queryClient) => {
-  return async ({ params }) => {
-    const query = submithistoryQuery(params.sessionId);
-    const data = await queryClient.ensureQueryData(query);
-    return data;
-  };
-};
+const columns = [
+  {
+    field: "is_finited",
+    headerName: "Is Finited",
+    type: "boolean",
+    flex: 1
+  },
+  {
+    field: "is_completed",
+    headerName: "Is Completed",
+    type: "boolean",
+    flex: 1
+  },
+  {
+    field: "command_medal",
+    headerName: "Command Medal",
+    flex: 1
+  },
+  {
+    field: "action_medal",
+    headerName: "Action Medal",
+    flex: 1
+  },
+  {
+    field: "submit_datetime",
+    headerName: "Submit Datetime",
+    type: "date",
+    valueGetter: (params) => new Date(params.value),
+    valueFormatter: (params) => params.value.toLocaleString("en-GB"),
+    flex: 1
+  }
+];
 
 const SessionInfo = () => {
-  const { sessionId } = useParams();
-  const { data: submitHistories, isLoading } = useQuery(submithistoryQuery(sessionId));
+  const { state } = useLocation();
+  const [selectedSubmitData, setSelectedSubmitData] = useState(null);
 
-  const columns = [
-    {
-      field: "is_finited",
-      headerName: "Is Finited",
-      type: "boolean",
-      flex: 1
-    },
-    {
-      field: "is_completed",
-      headerName: "Is Completed",
-      type: "boolean",
-      flex: 1
-    },
-    {
-      field: "command_medal",
-      headerName: "Command Medal",
-      flex: 1
-    },
-    {
-      field: "action_medal",
-      headerName: "Action Medal",
-      flex: 1
-    },
-    {
-      field: "submit_datetime",
-      headerName: "Submit Datetime",
-      type: "date",
-      valueGetter: (params) => new Date(params.value),
-      valueFormatter: (params) => params.value.toLocaleString("en-GB"),
-      flex: 1
+  const stateValueCommandDisplay = useMemo(() => {
+    if (selectedSubmitData) {
+      return [
+        {
+          name: "Command",
+          value: selectedSubmitData.state_value.command_count
+        },
+        {
+          name: "Forward Command",
+          value: selectedSubmitData.state_value.forward_command_count
+        },
+        {
+          name: "Right Command",
+          value: selectedSubmitData.state_value.right_command_count
+        },
+        {
+          name: "Back Command",
+          value: selectedSubmitData.state_value.back_command_count
+        },
+        {
+          name: "Left Command",
+          value: selectedSubmitData.state_value.left_command_count
+        },
+        {
+          name: "Condition Command",
+          value: selectedSubmitData.state_value.condition_command_count
+        }
+      ];
     }
-  ];
+    return null;
+  }, [selectedSubmitData])
 
-  const stateValueCommandDisplay = [
-    {
-      name: "Command",
-      value: 1
-    },
-    {
-      name: "Forward Command",
-      value: 1
-    },
-    {
-      name: "Right Command",
-      value: 1
-    },
-    {
-      name: "Back Command",
-      value: 1
-    },
-    {
-      name: "Left Command",
-      value: 1
-    },
-    {
-      name: "Condition Command",
-      value: 1
+  const stateValueActionDisplay = useMemo(() => {
+    if (selectedSubmitData) {
+      return [
+        {
+          name: "Action",
+          value: selectedSubmitData.state_value.action_count
+        },
+        {
+          name: "Forward Action",
+          value: selectedSubmitData.state_value.forward_action_count
+        },
+        {
+          name: "Right Action",
+          value: selectedSubmitData.state_value.right_action_count
+        },
+        {
+          name: "Back Action",
+          value: selectedSubmitData.state_value.back_action_count
+        },
+        {
+          name: "Left Action",
+          value: selectedSubmitData.state_value.left_action_count
+        },
+        {
+          name: "Condition Action",
+          value: selectedSubmitData.state_value.condition_action_count
+        }
+      ];
     }
-  ];
+    return null;
+  }, [selectedSubmitData])
 
-  const stateValueActionDisplay = [
-    {
-      name: "Action",
-      value: 1
-    },
-    {
-      name: "Forward Action",
-      value: 1
-    },
-    {
-      name: "Right Action",
-      value: 1
-    },
-    {
-      name: "Back Action",
-      value: 1
-    },
-    {
-      name: "Left Action",
-      value: 1
-    },
-    {
-      name: "Condition Action",
-      value: 1
+  const stateValueItemDisplay = useMemo(() => {
+    if (selectedSubmitData) {
+      return [
+        {
+          name: "All Item",
+          value: selectedSubmitData.state_value.all_item_count
+        },
+        {
+          name: "Key A Item",
+          value: selectedSubmitData.state_value.keya_item_count
+        },
+        {
+          name: "Key B Item",
+          value: selectedSubmitData.state_value.keyb_item_count
+        },
+        {
+          name: "Key C Item",
+          value: selectedSubmitData.state_value.keyc_item_count
+        }
+      ];
     }
-  ];
+    return null;
+  }, [selectedSubmitData]) 
+
+  const commandAdjacencyList = useMemo(() => {
+    if (selectedSubmitData) {
+      return toAdjacencyList(selectedSubmitData.command_nodes, selectedSubmitData.command_edges)
+    }
+    return null;
+  }, [selectedSubmitData]);
+
+  const handleSelectionChange = (selectionModel) => {
+    const selectedRowId = selectionModel[0];
+    const selectedData = state.submit_histories.find((s) => s.submit_history_id === selectedRowId);
+    setSelectedSubmitData(selectedData);
+  };
 
   return (
     <>
@@ -116,6 +154,7 @@ const SessionInfo = () => {
 
       <Grid container spacing={2}>
         <Grid item md={12}>
+          {/* Submit Histories */}
           <DataBox
             title="Submit Histories"
             sx={{
@@ -130,86 +169,120 @@ const SessionInfo = () => {
               }
             }}
             contentComponent={
-              !isLoading ? (
-                <DataGrid
-                  rows={submitHistories}
-                  columns={columns}
-                  components={{ Toolbar: GridToolbar }}
-                  getRowId={(row) => row.submit_history_id}
-                  autoPageSize
-                  sx={{ height: "60vh", border: "none" }}
-                />
-              ) : (
-                <DataGrid
-                  loading
-                  rows={[]}
-                  columns={columns}
-                  components={{ Toolbar: GridToolbar }}
-                  getRowId={(row) => row.submit_history_id}
-                  autoPageSize
-                  sx={{ height: "60vh", border: "none" }}
-                />
-              )
-
+              <DataGrid
+                rows={state.submit_histories}
+                columns={columns}
+                components={{ Toolbar: GridToolbar }}
+                getRowId={(row) => row.submit_history_id}
+                autoPageSize
+                onRowSelectionModelChange={handleSelectionChange}
+                sx={{ height: "60vh", border: "none" }}
+              />
             }
           />
         </Grid>
-        <Grid item md={4}>
-          <DataBox
-            disableContentPadding
-            title="State Value"
-            contentComponent={
-              <Grid container spacing={1}>
-                <Grid item md={6}>
+        {selectedSubmitData ?
+          (<>
+            <Grid item md={4}>
+              {/* State Value */}
+              <DataBox
+                title="State Value"
+                contentComponent={
+                  <Grid container spacing={2}>
+                    <Grid item md={6}>
+                      <List>
+                        {
+                          stateValueCommandDisplay.map((s, idx) => (
+                            <ListItem key={idx} disablePadding>
+                              <ListItemText primary={
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
+                                  <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
+                                </Stack>
+                              }/>
+                            </ListItem>
+                          ))
+                        }
+                      </List>
+                    </Grid>
+                    <Grid item md={6}>
+                      <List>
+                        {
+                          stateValueActionDisplay.map((s, idx) => (
+                            <ListItem key={idx} disablePadding>
+                              <ListItemText primary={
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
+                                  <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
+                                </Stack>
+                              } />
+                            </ListItem>
+                          ))
+                        }
+                      </List>
+                    </Grid>
+                    <Grid item md={6}>
+                      <List>
+                        {
+                          stateValueItemDisplay.map((s, idx) => (
+                            <ListItem key={idx} disablePadding>
+                              <ListItemText primary={
+                                <Stack direction="row" justifyContent="space-between">
+                                  <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
+                                  <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
+                                </Stack>
+                              } />
+                            </ListItem>
+                          ))
+                        }
+                      </List>
+                    </Grid>
+                  </Grid>
+                }
+              />
+            </Grid>
+            <Grid item md={4}>
+              {/* Rules */}
+              <DataBox
+                title="Rules"
+                contentComponent={
                   <List>
                     {
-                      stateValueCommandDisplay.map((s, idx) => (
-                        <ListItem key={idx}>
-                          <ListItemText primary={
-                            <>
-                              <Box display="flex" justifyContent="space-between">
-                                <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
-                                <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
-                              </Box>
-                            </>
-                          } />
+                      selectedSubmitData.rules.map((r, idx) => (
+                        <ListItem key={idx} disablePadding>
+                          <ListItemText
+                            primary={ruleDisplay(r.rule)}
+                            secondary={`${r.rule.rule_theme} theme`}
+                          />
+                          <ListItemIcon>
+                            {r.is_pass ? <CheckIcon /> : <CloseIcon />}
+                          </ListItemIcon>
                         </ListItem>
                       ))
                     }
                   </List>
-                </Grid>
-                <Grid item md={6}>
+                }
+              />
+            </Grid>
+            <Grid item md={4}>
+              {/* Commands */}
+              <DataBox
+                title="Commands"
+                contentComponent={
                   <List>
                     {
-                      stateValueActionDisplay.map((s, idx) => (
-                        <ListItem key={idx}>
-                          <ListItemText primary={
-                            <>
-                              <Box display="flex" justifyContent="space-between">
-                                <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
-                                <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
-                              </Box>
-                            </>
-                          } />
+                      commandAdjacencyList.map((c, idx) => (
+                        <ListItem key={idx} disablePadding>
+                          <ListItemText primary={commandDisplay(c, idx)}/>
                         </ListItem>
                       ))
                     }
                   </List>
-                </Grid>
-              </Grid>
-            }
-          />
-        </Grid>
-        <Grid item md={4}>
-          <DataBox
-            title="Rules"
-          />
-        </Grid>
-        <Grid item md={4}>
-          <DataBox
-            title="Commands"
-          />
-        </Grid>
+                }
+              />
+            </Grid>
+          </>) : (<></>)
+        }
       </Grid>
 
 
