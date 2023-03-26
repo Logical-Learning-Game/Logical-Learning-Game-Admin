@@ -6,6 +6,7 @@ import SessionInfo from "./pages/players/SessionInfo";
 import MapList, {loader as mapListLoader} from "./pages/maps";
 import App from "./App";
 import TopSubmitInfo from "./pages/players/TopSubmitInfo";
+import MapBuilder from "./pages/maps/MapBuilder";
 
 export const router = createBrowserRouter([
     {
@@ -33,7 +34,11 @@ export const router = createBrowserRouter([
             {
                 path: "maps",
                 element: <MapList/>,
-                loader: mapListLoader(queryClient)
+                loader: mapListLoader(queryClient),
+            },
+            {
+                path: "maps/build",
+                element: <MapBuilder/>
             }
         ]
     }

@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
-import { useQuery } from "@tanstack/react-query";
-import { playerListQueryOption } from "../../api/fetchData";
 import DataBox from "../../components/DataBox";
+import { usePlayerListQuery, playerListQueryOption } from "../../hooks/usePlayerListQuery";
 
 
 
@@ -19,7 +18,7 @@ export const loader = (queryClient) => {
 };
 
 const PlayerList = () => {
-    const { data: players, isLoading } = useQuery(playerListQueryOption());
+    const { data: players, isLoading } = usePlayerListQuery();
 
     const columns = [
         {
@@ -54,16 +53,6 @@ const PlayerList = () => {
                             size="small"
                         >
                             Info
-                        </Button>
-                        <Button
-                            component={Link}
-                            to={`${data.id}/maps`}
-                            variant="contained" color="primary"
-                            startIcon={<VideogameAssetOutlinedIcon />}
-                            onClick={() => console.log("maps click")}
-                            size="small"
-                        >
-                            Maps
                         </Button>
                     </Stack>
                 );

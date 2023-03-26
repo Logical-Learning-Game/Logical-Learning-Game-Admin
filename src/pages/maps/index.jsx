@@ -1,47 +1,18 @@
-import { Box, Card, CardContent, CardHeader, Stack, Button, CardMedia, Typography, Grid, List, ListItem, ListItemText, CardActions } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Stack, Button, CardMedia, Typography, Grid, List, ListItem, ListItemText, CardActions, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
 import VideogameAssetOffOutlinedIcon from '@mui/icons-material/VideogameAssetOffOutlined';
-import { worldQueryOption, worldWithMapQueryOption } from "../../api/fetchData";
+import { useState } from "react";
 import Header from "../../components/Header";
 import { ruleDisplay } from "../../utils/rule";
+import { useEditWorld } from "../../hooks/useEditWorld";
+import { useCreateWorld } from "../../hooks/useCreateWorld";
+import { useWorldQuery, worldQueryOption } from "../../hooks/useWorldQuery";
+import { useWorldWithMapQuery, worldWithMapQueryOption } from "../../hooks/useWorldWithMapQuery";
 
-
-const worldColumns = [
-  {
-    field: "world_id",
-    headerName: "ID",
-    flex: 2
-  },
-  {
-    field: "world_name",
-    headerName: "Name",
-    flex: 3
-  },
-  {
-    field: "action",
-    headerName: "Action",
-    flex: 1,
-    renderCell: (row) => {
-      return (
-        <Button
-          component={Link}
-          to={`world/${row.id}/edit`}
-          variant="contained"
-          size="small"
-          startIcon={<EditOutlinedIcon />}
-          color="secondary"
-        >
-          Edit
-        </Button>
-      );
-    }
-  }
-];
 
 export const loader = (queryClient) => {
   return async ({ params }) => {
@@ -59,12 +30,133 @@ export const loader = (queryClient) => {
 };
 
 const MapList = () => {
-  const { data: worlds, isLoading: isWorldsLoading } = useQuery(worldQueryOption());
-  const { data: worldWithMaps, isLoading: isWorldWithMapLoading } = useQuery(worldWithMapQueryOption());
+  const [editWorldDialogOpen, setEditWorldDialogOpen] = useState(false);
+  const [editWorldDialogFormData, setEditWorldDialogFormData] = useState({ id: null, name: null });
+  const [createWorldDialogOpen, setCreateWorldDialogOpen] = useState(false);
+  const [createWorldDialogFormData, setCreateWorldDialogFormData] = useState({name: null});
+  const { data: worlds, isLoading: isWorldsLoading } = useWorldQuery();
+  const { data: worldWithMaps, isLoading: isWorldWithMapLoading } = useWorldWithMapQuery();
+  const editWorldMutation = useEditWorld();
+  const createWorldMutation = useCreateWorld();
+
+  const handleEditWorldDialogOpen = (id, worldName) => {
+    setEditWorldDialogOpen(true);
+    setEditWorldDialogFormData({ id: id, name: worldName })
+  };
+
+  const handleEditWorldDialogClose = () => {
+    setEditWorldDialogOpen(false);
+    setEditWorldDialogFormData({ id: null, name: null });
+  };
+
+  const handleEditWorldDialogSave = () => {
+    editWorldMutation.mutate({worldId: editWorldDialogFormData.id, data: {world_name: editWorldDialogFormData.name}})
+    setEditWorldDialogOpen(false);
+  };
+
+  const handleCreateWorldDialogOpen = () => {
+    setCreateWorldDialogOpen(true);
+  };
+
+  const handleCreateWorldDialogClose = () => {
+    setCreateWorldDialogOpen(false);
+    setCreateWorldDialogFormData({name: null});
+  };
+
+  const handleCreateWorldDialogCreate = () => {
+    createWorldMutation.mutate({data: {world_name: createWorldDialogFormData.name}})
+    setCreateWorldDialogOpen(false);
+  };
+
+  const worldColumns = [
+    {
+      field: "world_id",
+      headerName: "ID",
+      flex: 2
+    },
+    {
+      field: "world_name",
+      headerName: "Name",
+      flex: 3
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) => {
+        return (
+          <Button
+            onClick={() => handleEditWorldDialogOpen(params.id, params.row.world_name)}
+            variant="contained"
+            size="small"
+            startIcon={<EditOutlinedIcon />}
+            color="secondary"
+          >
+            Edit
+          </Button>
+        );
+      }
+    }
+  ];
 
   return (
     <>
       <Header title="MAPS" subtitle="Managing the maps" />
+
+      {/* EDIT WORLD DIALOG */}
+      <Dialog
+        open={editWorldDialogOpen}
+        onClose={handleEditWorldDialogClose}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>Edit World</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="world-name"
+            label="Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            defaultValue={editWorldDialogFormData.name}
+            onBlur={(event) => setEditWorldDialogFormData({...editWorldDialogFormData, name: event.target.value})}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditWorldDialogClose}>Cancel</Button>
+          <Button onClick={handleEditWorldDialogSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CREATE WORLD DIALOG */}
+      <Dialog
+        open={createWorldDialogOpen}
+        onClose={handleCreateWorldDialogClose}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>Create World</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="world-name"
+            label="Name"
+            type="text"
+            fullWidth
+            variant="standard"
+            onBlur={(event) => setCreateWorldDialogFormData({...createWorldDialogFormData, name: event.target.value})}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCreateWorldDialogClose}>Cancel</Button>
+          <Button onClick={handleCreateWorldDialogCreate}>Create</Button>
+        </DialogActions>
+      </Dialog>
 
       <Stack spacing={2}>
         <Card>
@@ -72,6 +164,7 @@ const MapList = () => {
             title="World List"
             action={
               <Button
+                onClick={handleCreateWorldDialogOpen}
                 color="primary"
                 variant="contained"
                 startIcon={<AddCircleOutlineOutlinedIcon />}>
@@ -97,6 +190,8 @@ const MapList = () => {
             title="Map List"
             action={
               <Button
+                component={Link}
+                to="build"
                 color="primary"
                 variant="contained"
                 startIcon={<AddCircleOutlineOutlinedIcon />}
@@ -110,7 +205,7 @@ const MapList = () => {
             <Stack spacing={2}>
               {
                 !isWorldWithMapLoading && worldWithMaps.map((m, idx) => (
-                  <Card key={idx} sx={{ display: "flex" }}>
+                  <Card key={idx} sx={{ display: "flex" }} elevation={5}>
                     <CardMedia
                       component="img"
                       sx={{ width: 420 }}
@@ -210,33 +305,33 @@ const MapList = () => {
 
                         </Grid>
                         <Grid item md={4}>
-                          
-                            <Box>
-                              <Typography variant="subtitle2" color="text.secondary">
-                                Rules
-                              </Typography>
-                              <List disablePadding>
-                                {
-                                  m.rules.map((r, idx) => (
-                                    <ListItem key={idx} disablePadding>
-                                      <ListItemText
-                                        primary={ruleDisplay(r)}
-                                        primaryTypographyProps={{ variant: "subtitle2" }}
-                                        secondary={`${r.rule_theme} theme`}
-                                        secondaryTypographyProps={{ variant: "body2", fontWeight: "light" }}
-                                      />
-                                    </ListItem>
-                                  ))
-                                }
-                              </List>
-                            </Box>
+
+                          <Box>
+                            <Typography variant="subtitle2" color="text.secondary">
+                              Rules
+                            </Typography>
+                            <List disablePadding>
+                              {
+                                m.rules.map((r, idx) => (
+                                  <ListItem key={idx} disablePadding>
+                                    <ListItemText
+                                      primary={ruleDisplay(r)}
+                                      primaryTypographyProps={{ variant: "subtitle2" }}
+                                      secondary={`${r.rule_theme} theme`}
+                                      secondaryTypographyProps={{ variant: "body2", fontWeight: "light" }}
+                                    />
+                                  </ListItem>
+                                ))
+                              }
+                            </List>
+                          </Box>
                         </Grid>
                       </Grid>
 
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
                         <Button
                           variant="contained"
-                          startIcon={<EditOutlinedIcon/>}
+                          startIcon={<EditOutlinedIcon />}
                           size="small"
                           color="secondary"
                         >
@@ -244,7 +339,7 @@ const MapList = () => {
                         </Button>
                         <Button
                           variant="contained"
-                          startIcon={<VideogameAssetOffOutlinedIcon/>}
+                          startIcon={<VideogameAssetOffOutlinedIcon />}
                           size="small"
                           color="warning"
                         >

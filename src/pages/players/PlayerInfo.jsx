@@ -2,13 +2,13 @@ import { List, ListItem, ListItemText, ListItemIcon, Button, Grid } from "@mui/m
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Link, useLocation, useParams } from "react-router-dom";
 import Header from "../../components/Header";
-import { useQuery } from "@tanstack/react-query";
-import { playerSessionQueryOption, playerMapInfoQueryOption } from "../../api/fetchData";
 import DataBox from "../../components/DataBox";
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import AbcOutlinedIcon from '@mui/icons-material/AbcOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
+import { usePlayerSessionQuery, playerSessionQueryOption } from "../../hooks/usePlayerSessionQuery";
+import { usePlayerMapInfoQuery, playerMapInfoQueryOption } from "../../hooks/usePlayerMapInfoQuery";
 
 
 export const loader = (queryClient) => {
@@ -141,8 +141,8 @@ const PlayerInfo = () => {
     const { playerId } = useParams();
     const { state } = useLocation();
 
-    const { data: sessions, isLoading: isSessionLoading } = useQuery(playerSessionQueryOption(playerId));
-    const { data: mapInfos, isLoading: isMapInfoLoading } = useQuery(playerMapInfoQueryOption(playerId));
+    const { data: sessions, isLoading: isSessionLoading } = usePlayerSessionQuery(playerId);
+    const { data: mapInfos, isLoading: isMapInfoLoading } = usePlayerMapInfoQuery(playerId);
 
     const mockSignInHistoryData = [
         {
