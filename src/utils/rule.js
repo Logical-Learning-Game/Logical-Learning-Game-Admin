@@ -68,15 +68,15 @@ export const ruleDisplay = (rule) => {
         case ruleType.COMMAND_LIMIT_RULE:
             const commandType = getLimitType(rule.parameters[2]);
             const commandText = getCommandRuleText(commandType);
-            displayData = `${commandText} is ${rule.parameters[1] === 1 ? "more than" : "less than"} ${rule.parameters[0]}`;
+            displayData = `${commandText} is ${rule.parameters[1] === 1 ? "more than" : "less than"} or equal to ${rule.parameters[0]}`;
             break;
         case ruleType.ACTION_LIMIT_RULE:
             const actionType = getLimitType(rule.parameters[2]);
             const actionText = getActionRuleText(actionType);
-            displayData = `${actionText} is ${rule.parameters[1] === 1 ? "more than" : "less than"} ${rule.parameters[0]}`;
+            displayData = `${actionText} is ${rule.parameters[1] === 1 ? "more than" : "less than"} or equal to ${rule.parameters[0]}`;
             break;
         case ruleType.ITEM_COLLECTOR_RULE:
-            displayData = `Item is ${rule.parameters[1] === 1 ? "more than" : "less than"} ${rule.parameters[0]}`;
+            displayData = `Have item in inventory ${rule.parameters[1] === 1 ? "more than" : "less than"} or equal to ${rule.parameters[0]}`;
             break;
         default:
             displayData = "Default display data";

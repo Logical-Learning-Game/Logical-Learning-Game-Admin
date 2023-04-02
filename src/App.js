@@ -1,4 +1,4 @@
-import { ThemeProvider, CssBaseline, Box } from "@mui/material";
+import { ThemeProvider, CssBaseline, Box, Container } from "@mui/material";
 import { theme } from "./theme";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Outlet } from "react-router-dom";
@@ -18,13 +18,14 @@ const App = () => {
           <Sidebar />
           <Box width="100%">
             <Topbar />
-            <Box
-              px={5}
-              py={1}
-              mb={2}
+            <Container 
+              fixed
+              sx={{
+                mb: 2
+              }}
             >
               <Outlet />
-            </Box>
+            </Container>
           </Box>
         </Box>
 

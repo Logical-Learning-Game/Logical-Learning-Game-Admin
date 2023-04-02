@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { containEastDoor, containNorthDoor, containWestDoor, containSouthDoor } from "../pages/maps/MapBuilder";
+import { containEastDoor, containNorthDoor, containWestDoor, containSouthDoor } from "../utils/map";
 
 const getElementAsText = (element) => {
     const elements = [];

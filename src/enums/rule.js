@@ -14,4 +14,10 @@ export const ruleType = {
     ITEM_COLLECTOR_RULE: "item_collector_rule"
 };
 
+export const ruleThemeType = {
+    NORMAL: "normal",
+    LOOP: "loop",
+    CONDITIONAL: "conditional"
+};
+
 export const getLimitType = (param) => [limitType.ALL, limitType.FORWARD, limitType.LEFT, limitType.RIGHT, limitType.BACK, limitType.CONDITION][param];

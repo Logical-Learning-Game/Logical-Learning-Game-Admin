@@ -1,103 +1,107 @@
-import { Box, Card, CardHeader, CardContent, Grid, Stack, MenuItem, Button, Typography, Chip, FormControl, Select, InputLabel } from "@mui/material";
-import { useState } from "react";
-import Header from "../../components/Header";
+import { Grid, Stack, Button } from "@mui/material";
 import { useWorldQuery } from "../../hooks/useWorldQuery";
-import { ruleThemeType, ruleType } from "../../enums/rule";
-import RuleEditorCard from "../../components/RuleEditorCard";
-import MapDetailEditorCard from "../../components/MapDetailEditorCard";
-import { playerDirectionType } from "../../enums/player";
-import { useCreateMap } from "../../hooks/useCreateMap";
+import { useState } from "react";
+import * as mapUtil from "../../utils/map";
+import Header from "../../components/Header";
 import MapEditorCard from "../../components/MapEditorCard";
 import MapObjectsCard from "../../components/MapObjectsCard";
-import * as mapUtil from "../../utils/map";
+import MapDetailEditorCard from "../../components/MapDetailEditorCard";
+import RuleEditorCard from "../../components/RuleEditorCard";
 import MapAnalyzerCard from "../../components/MapAnalyzerCard";
+import { ruleType } from "../../enums/rule";
+import { playerDirectionType } from "../../enums/player";
+import { useLoaderData, useParams } from "react-router-dom";
+import { mapQueryOption } from "../../hooks/useMapQuery";
+import { makeArray } from "../../utils/map";
+import { useEditMap } from "../../hooks/useEditMap";
 
+const transformTile = (tile, height, width) => {
+  const mapHeight = height;
+  const mapWidth = width;
+  const mapElements = makeArray(mapHeight, mapWidth);
+
+  let idx = 0;
+  for (let i = mapHeight - 1; i >= 0; i--) {
+    for (let j = mapWidth - 1; j >= 0; j--) {
+      mapElements[i][j] = tile[idx];
+      idx++;
+    }
+  }
+
+  return mapElements;
+};
+
+export const loader = (queryClient) => {
+  return async ({ params }) => {
+    const query = mapQueryOption(params.mapId);
+    const data = await queryClient.ensureQueryData(query);
+
+    const mapData = {
+      worldId: data.world_id,
+      name: data.map_name,
+      difficulty: data.difficulty,
+      starRequirement: data.star_requirement,
+      leastSolvableCommandGold: data.least_solvable_command_gold,
+      leastSolvableCommandSilver: data.least_solvable_command_silver,
+      leastSolvableCommandBronze: data.least_solvable_command_bronze,
+      leastSolvableActionGold: data.least_solvable_action_gold,
+      leastSolvableActionSilver: data.least_solvable_action_silver,
+      leastSolvableActionBronze: data.least_solvable_action_bronze,
+      currentFile: undefined,
+      previewImage: data.map_image_path
+    };
+
+    const playerData = {
+      startPlayerPositionX: data.start_player_position_x,
+      startPlayerPositionY: data.start_player_position_y,
+      goalPositionX: data.goal_position_x,
+      goalPositionY: data.goal_position_y
+    };
+
+    return {
+      mapData: mapData,
+      rulesData: data.rules.map((r) => ({
+        name: r.rule_name,
+        theme: r.rule_theme,
+        parameters: r.parameters
+      })),
+      tileData: transformTile(data.tile, data.height, data.width),
+      playerData: playerData,
+      playerDirection: data.start_player_direction
+    };
+  };
+};
 
 const MAX_HEIGHT = 9;
 const MAX_WIDTH = 9;
 const MIN_HEIGHT = 1;
 const MIN_WIDTH = 1;
 
-// const createMapFormInitialValues = {
-//   world: "",
-//   name: "",
-//   difficulty: "",
-//   starRequirement: 0,
-//   leastSolvableCommandGold: 0,
-//   leastSolvableCommandSilver: 0,
-//   leastSolvableCommandBronze: 0,
-//   leastSolvableActionGold: 0,
-//   leastSolvableActionSilver: 0,
-//   leastSolvableActionBronze: 0,
-// };
+const MapEditor = () => {
+  const { mapId } = useParams();
 
-// const mapSchema = yup.object().shape({
-//   world: yup.string().required("required"),
-//   name: yup.string().required("required"),
-//   difficulty: yup.string().required("required"),
-//   starRequirement: yup.number().required("required").positive().integer(),
-//   leastSolvableCommandGold: yup.number().required("required").positive().integer(),
-// });
-
-const MapBuilder = () => {
   // Query
   const { data: worlds, isLoading } = useWorldQuery();
+  const loaderData = useLoaderData();
 
   // Mutation
-  const createMapMutation = useCreateMap();
+  const editMapMutation = useEditMap();
 
   // Map 
-  const [mapElements, setMapElements] = useState(mapUtil.makeArray(4, 4));
+  const [mapElements, setMapElements] = useState(loaderData.tileData);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [havePlayer, setHavePlayer] = useState(false);
-  const [haveGoal, setHaveGoal] = useState(false);
-  const [selectedPlayerDirection, setSelectedPlayerDirection] = useState("");
-
-  // Additional data
-  const [playerData, setPlayerData] = useState({
-    startPlayerPositionX: null,
-    startPlayerPostionY: null,
-    goalPositionX: null,
-    goalPositionY: null,
-  });
+  const [havePlayer, setHavePlayer] = useState(true);
+  const [haveGoal, setHaveGoal] = useState(true);
+  const [selectedPlayerDirection, setSelectedPlayerDirection] = useState(loaderData.playerDirection);
 
   // Detail
-  const [mapDetailFormData, setMapDetailFormData] = useState({
-    worldId: "",
-    name: "",
-    difficulty: "",
-    starRequirement: undefined,
-    leastSolvableCommandGold: undefined,
-    leastSolvableCommandSilver: undefined,
-    leastSolvableCommandBronze: undefined,
-    leastSolvableActionGold: undefined,
-    leastSolvableActionSilver: undefined,
-    leastSolvableActionBronze: undefined,
-    currentFile: undefined,
-    previewImage: undefined
-  });
+  const [mapDetailFormData, setMapDetailFormData] = useState(loaderData.mapData);
+
+  // Additional data
+  const [playerData, setPlayerData] = useState(loaderData.playerData);
 
   // Rule
-  const [rules, setRules] = useState([
-    {
-      name: ruleType.LEVEL_CLEAR_RULE,
-      theme: ruleThemeType.NORMAL,
-      parameters: []
-    },
-    {
-      name: ruleType.COMMAND_LIMIT_RULE,
-      theme: ruleThemeType.NORMAL,
-      parameters: [0, 0, 0]
-    },
-    {
-      name: ruleType.ACTION_LIMIT_RULE,
-      theme: ruleThemeType.NORMAL,
-      parameters: [0, 0, 0]
-    }
-  ]);
-
-  const mapHeight = mapElements.length;
-  const mapWidth = mapElements[0].length;
+  const [rules, setRules] = useState(loaderData.rulesData);
 
   const handleSelectImageFile = (event) => {
     setMapDetailFormData({
@@ -174,6 +178,9 @@ const MapBuilder = () => {
   };
 
   const selectedElementDoor = getDoorFromSelectedElement();
+
+  const mapHeight = mapElements.length;
+  const mapWidth = mapElements[0].length;
 
   const handleIncreaseHeight = () => {
     if (mapHeight < MAX_HEIGHT) {
@@ -399,7 +406,7 @@ const MapBuilder = () => {
     setRules(newRules);
   };
 
-  const handleCreateMapSubmit = () => {
+  const handleEditMapSubmit = () => {
     const flattenTile = [];
     for (let i = mapHeight - 1; i >= 0; i--) {
       for (let j = mapWidth - 1; j >= 0; j--) {
@@ -436,12 +443,12 @@ const MapBuilder = () => {
       formData.append("image", mapDetailFormData.currentFile, mapDetailFormData.currentFile.name);
     }
 
-    createMapMutation.mutate({ data: formData });
+    editMapMutation.mutate({ mapId: mapId, data: formData});
   };
 
   return (
     <>
-      <Header title="MAP BUILDER" subtitle="Build your map" />
+      <Header title="MAP EDITOR" subtitle="Edit your map" />
 
       <Grid container spacing={2}>
         <Grid item md={8}>
@@ -511,12 +518,11 @@ const MapBuilder = () => {
       </Grid>
 
       <Stack direction="row" justifyContent="end" spacing={2} mt={2}>
-        <Button variant="contained" onClick={handleCreateMapSubmit}>Create</Button>
+        <Button variant="contained" onClick={handleEditMapSubmit}>Save</Button>
         <Button>Cancel</Button>
       </Stack>
-
     </>
   );
 };
 
-export default MapBuilder;
+export default MapEditor;

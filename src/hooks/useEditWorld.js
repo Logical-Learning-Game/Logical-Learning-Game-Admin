@@ -10,7 +10,7 @@ export const useEditWorld = () => {
 
     return useMutation(editWorld, {
         onSuccess: () => {
-            queryClient.invalidateQueries("world");
+            queryClient.invalidateQueries({queryKey: ["world", "worldWithMap"]});
         }
     });
 };

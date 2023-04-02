@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Stack, Button, CardMedia, Typography, Grid, List, ListItem, ListItemText, CardActions, Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Stack, Button, Typography, Grid, List, ListItem, ListItemText, CardActions, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -12,6 +12,8 @@ import { useEditWorld } from "../../hooks/useEditWorld";
 import { useCreateWorld } from "../../hooks/useCreateWorld";
 import { useWorldQuery, worldQueryOption } from "../../hooks/useWorldQuery";
 import { useWorldWithMapQuery, worldWithMapQueryOption } from "../../hooks/useWorldWithMapQuery";
+import { useSetMapActive } from "../../hooks/useSetMapActive";
+import mapConfig from "../../config/mapConfig";
 
 
 export const loader = (queryClient) => {
@@ -33,11 +35,12 @@ const MapList = () => {
   const [editWorldDialogOpen, setEditWorldDialogOpen] = useState(false);
   const [editWorldDialogFormData, setEditWorldDialogFormData] = useState({ id: null, name: null });
   const [createWorldDialogOpen, setCreateWorldDialogOpen] = useState(false);
-  const [createWorldDialogFormData, setCreateWorldDialogFormData] = useState({name: null});
+  const [createWorldDialogFormData, setCreateWorldDialogFormData] = useState({ name: null });
   const { data: worlds, isLoading: isWorldsLoading } = useWorldQuery();
   const { data: worldWithMaps, isLoading: isWorldWithMapLoading } = useWorldWithMapQuery();
   const editWorldMutation = useEditWorld();
   const createWorldMutation = useCreateWorld();
+  const setMapActiveMutation = useSetMapActive();
 
   const handleEditWorldDialogOpen = (id, worldName) => {
     setEditWorldDialogOpen(true);
@@ -50,7 +53,7 @@ const MapList = () => {
   };
 
   const handleEditWorldDialogSave = () => {
-    editWorldMutation.mutate({worldId: editWorldDialogFormData.id, data: {world_name: editWorldDialogFormData.name}})
+    editWorldMutation.mutate({ worldId: editWorldDialogFormData.id, data: { world_name: editWorldDialogFormData.name } })
     setEditWorldDialogOpen(false);
   };
 
@@ -60,12 +63,20 @@ const MapList = () => {
 
   const handleCreateWorldDialogClose = () => {
     setCreateWorldDialogOpen(false);
-    setCreateWorldDialogFormData({name: null});
+    setCreateWorldDialogFormData({ name: null });
   };
 
   const handleCreateWorldDialogCreate = () => {
-    createWorldMutation.mutate({data: {world_name: createWorldDialogFormData.name}})
+    createWorldMutation.mutate({ data: { world_name: createWorldDialogFormData.name } })
     setCreateWorldDialogOpen(false);
+  };
+
+  const handleEnableMap = (mapId) => {
+    setMapActiveMutation.mutate({mapId: mapId, data: {active: true}});
+  };
+
+  const handleDisableMap = (mapId) => {
+    setMapActiveMutation.mutate({mapId: mapId, data: {active: false}});
   };
 
   const worldColumns = [
@@ -122,7 +133,7 @@ const MapList = () => {
             fullWidth
             variant="standard"
             defaultValue={editWorldDialogFormData.name}
-            onBlur={(event) => setEditWorldDialogFormData({...editWorldDialogFormData, name: event.target.value})}
+            onBlur={(event) => setEditWorldDialogFormData({ ...editWorldDialogFormData, name: event.target.value })}
           />
         </DialogContent>
         <DialogActions>
@@ -149,7 +160,7 @@ const MapList = () => {
             type="text"
             fullWidth
             variant="standard"
-            onBlur={(event) => setCreateWorldDialogFormData({...createWorldDialogFormData, name: event.target.value})}
+            onBlur={(event) => setCreateWorldDialogFormData({ ...createWorldDialogFormData, name: event.target.value })}
           />
         </DialogContent>
         <DialogActions>
@@ -205,14 +216,11 @@ const MapList = () => {
             <Stack spacing={2}>
               {
                 !isWorldWithMapLoading && worldWithMaps.map((m, idx) => (
-                  <Card key={idx} sx={{ display: "flex" }} elevation={5}>
-                    <CardMedia
-                      component="img"
-                      sx={{ width: 420 }}
-                      image={m.map_image_path}
-                      alt={`Map ${m.map_id}`}
-                    />
-                    <CardContent sx={{ width: "100%" }}>
+                  <Card key={idx} sx={{ display: "flex", p: 1 }} raised>
+                    <Box width={300} ml={2}>
+                      <img src={m.map_image_path} alt={`Map ${m.map_id}`} style={{ objectFit: "contain", height: "100%", width: "100%" }} />
+                    </Box>
+                    <CardContent sx={{ width: "100%", ml: 2 }}>
                       <Grid container spacing={1}>
                         <Grid item md={3}>
                           <Stack direction="column" spacing={3}>
@@ -304,7 +312,7 @@ const MapList = () => {
                           </Stack>
 
                         </Grid>
-                        <Grid item md={4}>
+                        <Grid item md={5}>
 
                           <Box>
                             <Typography variant="subtitle2" color="text.secondary">
@@ -328,23 +336,43 @@ const MapList = () => {
                         </Grid>
                       </Grid>
 
-                      <CardActions sx={{ justifyContent: 'flex-end' }}>
+                      <CardActions sx={{ justifyContent: 'flex-end', gap: 2 }}>
                         <Button
+                          component={Link}
+                          to={`${m.map_id}/edit`}
                           variant="contained"
                           startIcon={<EditOutlinedIcon />}
                           size="small"
                           color="secondary"
+                          //disabled={mapConfig.defaultMap.includes(m.map_id)}
                         >
                           Edit
                         </Button>
-                        <Button
-                          variant="contained"
-                          startIcon={<VideogameAssetOffOutlinedIcon />}
-                          size="small"
-                          color="warning"
-                        >
-                          Disable
-                        </Button>
+                        {
+                          m.active ? (
+                            <Button
+                              variant="contained"
+                              startIcon={<VideogameAssetOffOutlinedIcon />}
+                              size="small"
+                              color="warning"
+                              onClick={() => handleDisableMap(m.map_id)}
+                              disabled={mapConfig.defaultMap.includes(m.map_id)}
+                            >
+                              Disable
+                            </Button>) : (
+                            <Button
+                              variant="contained"
+                              startIcon={<VideogameAssetOutlinedIcon />}
+                              size="small"
+                              color="success"
+                              onClick={() => handleEnableMap(m.map_id)}
+                              disabled={mapConfig.defaultMap.includes(m.map_id)}
+                            >
+                              Enable
+                            </Button>
+                          )
+                        }
+
                       </CardActions>
                     </CardContent>
                   </Card>

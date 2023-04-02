@@ -2,13 +2,15 @@ import { commandType, edgeType } from "../enums/command";
 
 export const commandDisplay = (commandNode, nodeIndex) => {
     let displayText;
-    if (commandNode.mainBranchNodeIndex) {
-        if (commandNode.conditionalBranchNodeIndex) {
-            const conditionText = getConditionText(commandNode.type);
-            displayText = `${nodeIndex + 1}. if (${conditionText}) then ${commandNode.conditionalBranchNodeIndex + 1} else ${commandNode.mainBranchNodeIndex + 1}`;
-        } else {
-            displayText = `${nodeIndex + 1}. ${commandNode.type}  -->  ${commandNode.mainBranchNodeIndex + 1}`;
-        }
+    const allConditionCommand = [commandType.CONDITIONAL_A, commandType.CONDITIONAL_B, commandType.CONDITIONAL_C, commandType.CONDITIONAL_D, commandType.CONDITIONAL_E];
+
+    if (allConditionCommand.includes(commandNode.type)) {
+        const conditionText = getConditionText(commandNode.type);
+        const conditionalBranchDisplay = commandNode.conditionalBranchNodeIndex ? commandNode.conditionalBranchNodeIndex + 1 : "?";
+        const mainBranchDisplay = commandNode.mainBranchNodeIndex ? commandNode.mainBranchNodeIndex + 1 : "?";
+        displayText = `${nodeIndex + 1}. if (${conditionText}) then ${conditionalBranchDisplay} else ${mainBranchDisplay}`;
+    } else if (commandNode.mainBranchNodeIndex) {
+        displayText = `${nodeIndex + 1}. ${commandNode.type}  -->  ${commandNode.mainBranchNodeIndex + 1}`;
     } else {
         displayText = `${nodeIndex + 1}. ${commandNode.type}`;
     }
