@@ -1,16 +1,21 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
-const mapAnalyze = ({data}) => {
+const mapAnalyze = async ({data}) => {
     console.log(data);
-    return axios.post("http://localhost:5182/api/MapAnalyze", data).then((res) => {
-        if (res.status === 200) {
-            return res.data;
-        }
+    const res = await axios.post(`${process.env.REACT_APP_MAP_ANALYZER_API_URL}/api/MapAnalyze`, data);
 
-        console.log(res.status);
-        throw new Error("Solution not found");
-    });
+    if (res.status === 200) {
+        return {...res.data, found: true};
+    } else if (res.status === 204) {
+        const error = new Error("Solution not found");
+        error.code = res.status;
+        throw error;
+    } else if (res.status === 504) {
+        const error = new Error("Timeout");
+        error.code = res.status;
+        throw error;
+    }
 };
 
 export const useMapAnalyze = () => {

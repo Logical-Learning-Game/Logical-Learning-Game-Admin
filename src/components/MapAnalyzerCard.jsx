@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent, Button, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Card, CardHeader, CardContent, Button, List, ListItem, ListItemText, Typography, CircularProgress } from "@mui/material";
 import { useMapAnalyze } from "../hooks/useMapAnalyzer";
 import { useMemo, useState } from "react";
 import { commandType, edgeType } from "../enums/command";
@@ -74,7 +74,7 @@ const MapAnalyzerCard = ({ mapElements, height, width }) => {
 
                 console.log(transformedData);
                 setAnalyzeResult(transformedData);
-            }
+            },
         });
     };
 
@@ -96,13 +96,13 @@ const MapAnalyzerCard = ({ mapElements, height, width }) => {
                 }
             />
 
-            <CardContent
-                sx={{
-                    overflowY: "auto"
-                }}
-            >
-                {
-                    analyzeResult && (
+            {
+                analyzeResult ? (
+                    <CardContent
+                        sx={{
+                            overflowY: "auto",
+                        }}
+                    >
                         <>
                             <Typography variant="h6">
                                 Commands
@@ -122,28 +122,61 @@ const MapAnalyzerCard = ({ mapElements, height, width }) => {
                             </Typography>
                             <List>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Command Gold: ${analyzeResult.leastSolvableCommandGold}`}/>
+                                    <ListItemText primary={`Least Solvable Command Gold: ${analyzeResult.leastSolvableCommandGold}`} />
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Command Silver: ${analyzeResult.leastSolvableCommandSilver}`}/>
+                                    <ListItemText primary={`Least Solvable Command Silver: ${analyzeResult.leastSolvableCommandSilver}`} />
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Command Bronze: ${analyzeResult.leastSolvableCommandBronze}`}/>
+                                    <ListItemText primary={`Least Solvable Command Bronze: ${analyzeResult.leastSolvableCommandBronze}`} />
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Action Gold: ${analyzeResult.leastSolvableActionGold}`}/>
+                                    <ListItemText primary={`Least Solvable Action Gold: ${analyzeResult.leastSolvableActionGold}`} />
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Action Silver: ${analyzeResult.leastSolvableActionSilver}`}/>
+                                    <ListItemText primary={`Least Solvable Action Silver: ${analyzeResult.leastSolvableActionSilver}`} />
                                 </ListItem>
                                 <ListItem disablePadding>
-                                    <ListItemText primary={`Least Solvable Action Bronze: ${analyzeResult.leastSolvableActionBronze}`}/>
+                                    <ListItemText primary={`Least Solvable Action Bronze: ${analyzeResult.leastSolvableActionBronze}`} />
                                 </ListItem>
                             </List>
                         </>
-                    )
-                }
-            </CardContent>
+                    </CardContent>
+                ) : (
+                    <CardContent
+                        sx={{
+                            overflowY: "auto",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flex: 1
+                        }}
+                    >
+                        {
+                            mapAnalyzeMutation.isLoading ? (
+                                <CircularProgress color="secondary"/>
+                            ) : mapAnalyzeMutation.isError ? (
+                                mapAnalyzeMutation.error.code === 204 ? (
+                                    <Typography textAlign="center">
+                                        Solution not found
+                                    </Typography>
+                                ) : mapAnalyzeMutation.error.code === 504 ? (
+                                    <Typography textAlign="center">
+                                        Timeout
+                                    </Typography>
+                                ) : (
+                                    null
+                                )
+                            ) : (
+                                <Typography textAlign="center">
+                                    Press analyze to start
+                                </Typography>
+                            )
+                        }
+                    </CardContent>
+                )
+            }
         </Card>
     );
 };

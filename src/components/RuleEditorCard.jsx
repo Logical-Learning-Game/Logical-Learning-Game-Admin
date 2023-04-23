@@ -1,4 +1,4 @@
-import { Card, CardHeader, Box, CardContent, Grid, InputLabel, MenuItem, FormControl, Select, TextField, Typography } from "@mui/material";
+import { Card, CardHeader, Box, CardContent, Grid, InputLabel, MenuItem, FormControl, Select, TextField } from "@mui/material";
 import { ruleType, ruleThemeType } from "../enums/rule";
 
 const RuleEditorCard = ({ rules, handleSetRuleName, handleSetRuleTheme, handleSetRuleParameterValue }) => {
@@ -105,8 +105,9 @@ const RuleEditorCard = ({ rules, handleSetRuleName, handleSetRuleTheme, handleSe
                                                     variant="filled"
                                                     label="Value"
                                                     type="text"
+                                                    value={r.parameters[0]}
+                                                    onChange={(event) => handleSetRuleParameterValue(idx, 0, event.target.value)}
                                                     onBlur={(event) => handleSetRuleParameterValue(idx, 0, parseInt(event.target.value))}
-                                                    defaultValue={r.parameters[0]}
                                                 />
                                             </Grid>
                                         </>
@@ -130,8 +131,9 @@ const RuleEditorCard = ({ rules, handleSetRuleName, handleSetRuleTheme, handleSe
                                                     variant="filled"
                                                     label="Value"
                                                     type="text"
+                                                    value={r.parameters[0]}
+                                                    onChange={(event) => handleSetRuleParameterValue(idx, 0, event.target.value)}
                                                     onBlur={(event) => handleSetRuleParameterValue(idx, 0, parseInt(event.target.value))}
-                                                    defaultValue={r.parameters[0]}
                                                 />
                                             </Grid>
                                         </>

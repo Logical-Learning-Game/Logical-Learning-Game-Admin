@@ -1,6 +1,6 @@
 import { Grid, Stack, Button } from "@mui/material";
 import { useWorldQuery } from "../../hooks/useWorldQuery";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as mapUtil from "../../utils/map";
 import Header from "../../components/Header";
 import MapEditorCard from "../../components/MapEditorCard";
@@ -10,10 +10,11 @@ import RuleEditorCard from "../../components/RuleEditorCard";
 import MapAnalyzerCard from "../../components/MapAnalyzerCard";
 import { ruleType } from "../../enums/rule";
 import { playerDirectionType } from "../../enums/player";
-import { useLoaderData, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { mapQueryOption } from "../../hooks/useMapQuery";
 import { makeArray } from "../../utils/map";
 import { useEditMap } from "../../hooks/useEditMap";
+import { useQueryClient } from "@tanstack/react-query";
 
 const transformTile = (tile, height, width) => {
   const mapHeight = height;
@@ -78,30 +79,89 @@ const MIN_HEIGHT = 1;
 const MIN_WIDTH = 1;
 
 const MapEditor = () => {
+  const navigate = useNavigate();
   const { mapId } = useParams();
 
   // Query
   const { data: worlds, isLoading } = useWorldQuery();
-  const loaderData = useLoaderData();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    (async () => {
+      const query = mapQueryOption(mapId);
+      const data = await queryClient.ensureQueryData(query);
+
+      const mapData = {
+        worldId: data.world_id,
+        name: data.map_name,
+        difficulty: data.difficulty,
+        starRequirement: data.star_requirement,
+        leastSolvableCommandGold: data.least_solvable_command_gold,
+        leastSolvableCommandSilver: data.least_solvable_command_silver,
+        leastSolvableCommandBronze: data.least_solvable_command_bronze,
+        leastSolvableActionGold: data.least_solvable_action_gold,
+        leastSolvableActionSilver: data.least_solvable_action_silver,
+        leastSolvableActionBronze: data.least_solvable_action_bronze,
+        currentFile: undefined,
+        previewImage: data.map_image_path
+      };
+
+      const playerData = {
+        startPlayerPositionX: data.start_player_position_x,
+        startPlayerPositionY: data.start_player_position_y,
+        goalPositionX: data.goal_position_x,
+        goalPositionY: data.goal_position_y
+      };
+
+      const rulesData = data.rules.map((r) => ({
+        name: r.rule_name,
+        theme: r.rule_theme,
+        parameters: r.parameters
+      }));
+
+      const tileData = transformTile(data.tile, data.height, data.width);
+
+      const playerDirection = data.start_player_direction;
+
+      setMapElements(tileData);
+      setSelectedPlayerDirection(playerDirection);
+      setMapDetailFormData(mapData);
+      setPlayerData(playerData);
+      setRules(rulesData);
+    })();
+  }, [mapId, queryClient])
 
   // Mutation
   const editMapMutation = useEditMap();
 
   // Map 
-  const [mapElements, setMapElements] = useState(loaderData.tileData);
+  const [mapElements, setMapElements] = useState([[]]);
   const [selectedElement, setSelectedElement] = useState(null);
   const [havePlayer, setHavePlayer] = useState(true);
   const [haveGoal, setHaveGoal] = useState(true);
-  const [selectedPlayerDirection, setSelectedPlayerDirection] = useState(loaderData.playerDirection);
+  const [selectedPlayerDirection, setSelectedPlayerDirection] = useState(playerDirectionType.NORTH);
 
   // Detail
-  const [mapDetailFormData, setMapDetailFormData] = useState(loaderData.mapData);
+  const [mapDetailFormData, setMapDetailFormData] = useState({
+    worldId: "",
+    name: "",
+    difficulty: "",
+    starRequirement: "",
+    leastSolvableCommandGold: "",
+    leastSolvableCommandSilver: "",
+    leastSolvableCommandBronze: "",
+    leastSolvableActionGold: "",
+    leastSolvableActionSilver: "",
+    leastSolvableActionBronze: "",
+    currentFile: undefined,
+    previewImage: undefined
+  });
 
   // Additional data
-  const [playerData, setPlayerData] = useState(loaderData.playerData);
+  const [playerData, setPlayerData] = useState(null);
 
   // Rule
-  const [rules, setRules] = useState(loaderData.rulesData);
+  const [rules, setRules] = useState([]);
 
   const handleSelectImageFile = (event) => {
     setMapDetailFormData({
@@ -443,7 +503,8 @@ const MapEditor = () => {
       formData.append("image", mapDetailFormData.currentFile, mapDetailFormData.currentFile.name);
     }
 
-    editMapMutation.mutate({ mapId: mapId, data: formData});
+    editMapMutation.mutate({ mapId: mapId, data: formData });
+    navigate("/maps");
   };
 
   return (
@@ -519,7 +580,7 @@ const MapEditor = () => {
 
       <Stack direction="row" justifyContent="end" spacing={2} mt={2}>
         <Button variant="contained" onClick={handleEditMapSubmit}>Save</Button>
-        <Button>Cancel</Button>
+        <Button onClick={() => navigate("/maps")}>Cancel</Button>
       </Stack>
     </>
   );

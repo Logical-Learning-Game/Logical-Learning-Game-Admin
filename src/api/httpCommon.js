@@ -1,9 +1,9 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "http://localhost:8000",
-  //baseURL: "http://ec2-46-137-199-250.ap-southeast-1.compute.amazonaws.com:8000",
+  baseURL: process.env.REACT_APP_API_URL,
   headers: {
-    "Content-type": "application/json"
+    "Content-type": "application/json",
+    "Authorization": `Bearer ${localStorage.getItem("token")}`
   }
 });

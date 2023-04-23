@@ -1,6 +1,5 @@
-import { Grid, List, ListItem, ListItemIcon, ListItemText, Box, Stack, Typography } from "@mui/material";
+import { Grid, List, ListItem, ListItemIcon, ListItemText, Box, Stack, Typography, Card, CardHeader, CardContent } from "@mui/material";
 import Header from "../../components/Header";
-import DataBox from "../../components/DataBox";
 import { useLocation } from "react-router-dom";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -92,12 +91,14 @@ const TopSubmitInfo = () => {
 
             <Grid container spacing={2}>
                 <Grid item md={4}>
-                    <DataBox
-                        title="Top Submit Detail"
-                        sx={{
-                            height: "320px"
-                        }}
-                        contentComponent={
+                    <Card>
+                        <CardHeader
+                            title="Top Submit Detail"
+                            sx={{ backgroundColor: "primary.dark" }}
+                        />
+                        <CardContent
+                            sx={{ height: "300px", overflowY: "auto" }}
+                        >
                             <List>
                                 <ListItem disableGutters>
                                     <Stack direction="row" justifyContent="space-between" width="100%">
@@ -148,16 +149,18 @@ const TopSubmitInfo = () => {
                                     </Stack>
                                 </ListItem>
                             </List>
-                        }
-                    />
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid item md={8}>
-                    <DataBox
-                        title="State Value"
-                        sx={{
-                            height: "320px"
-                        }}
-                        contentComponent={
+                    <Card>
+                        <CardHeader
+                            title="State Value"
+                            sx={{ backgroundColor: "primary.dark" }}
+                        />
+                        <CardContent
+                            sx={{ height: "300px", overflowY: "auto" }}
+                        >
                             <Grid container spacing={2}>
                                 <Grid item md={4}>
                                     <List>
@@ -214,16 +217,18 @@ const TopSubmitInfo = () => {
                                     </List>
                                 </Grid>
                             </Grid>
-                        }
-                    />
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid item md={6}>
-                    <DataBox
-                        title="Rules"
-                        sx={{
-                            height: "300px"
-                        }}
-                        contentComponent={
+                    <Card>
+                        <CardHeader
+                            title="Rules"
+                            sx={{ backgroundColor: "primary.dark" }}
+                        />
+                        <CardContent
+                            sx={{ height: "250px", overflowY: "auto" }}
+                        >
                             <List>
                                 {
                                     state.top_submit_history.rules.map((r, idx) => (
@@ -239,24 +244,29 @@ const TopSubmitInfo = () => {
                                     ))
                                 }
                             </List>
-                        }
-                    />
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid item md={6}>
-                    <DataBox
-                        title="Commands"
-                        contentComponent={
+                    <Card>
+                        <CardHeader
+                            title="Commands"
+                            sx={{ backgroundColor: "primary.dark" }}
+                        />
+                        <CardContent
+                            sx={{ height: "250px", overflowY: "auto" }}
+                        >
                             <List>
                                 {
                                     commandAdjacencyList.map((c, idx) => (
                                         <ListItem key={idx} disablePadding>
-                                            <ListItemText primary={commandDisplay(c, idx)}/>
+                                            <ListItemText primary={commandDisplay(c, idx)} />
                                         </ListItem>
                                     ))
                                 }
                             </List>
-                        }
-                    />
+                        </CardContent>
+                    </Card>
                 </Grid>
             </Grid>
         </>

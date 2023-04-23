@@ -34,10 +34,10 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Name"
-                            onBlur={(event) => {
+                            value={mapDetailFormData.name}
+                            onChange={(event) => {
                                 setMapDetailFormData({ ...mapDetailFormData, name: event.target.value });
                             }}
-                            defaultValue={mapDetailFormData.name}
                         />
                     </Grid>
 
@@ -66,12 +66,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Star Requirement"
+                            value={mapDetailFormData.starRequirement}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, starRequirement: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, starRequirement: parseInt(event.target.value) });
                                 }
                             }}
-                            defaultValue={mapDetailFormData.starRequirement}
                         />
                     </Grid>
 
@@ -82,12 +85,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Command Gold"
+                            value={mapDetailFormData.leastSolvableCommandGold}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandGold: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandGold: parseInt(event.target.value) });
-                                }  
+                                }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableCommandGold}
                         />
                     </Grid>
                     <Grid item md={4}>
@@ -96,12 +102,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Command Silver"
+                            value={mapDetailFormData.leastSolvableCommandSilver}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandSilver: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandSilver: parseInt(event.target.value) });
                                 }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableCommandSilver}
                         />
                     </Grid>
                     <Grid item md={4}>
@@ -110,12 +119,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Command Bronze"
+                            value={mapDetailFormData.leastSolvableCommandBronze}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandBronze: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableCommandBronze: parseInt(event.target.value) });
                                 }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableCommandBronze}
                         />
                     </Grid>
 
@@ -126,12 +138,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Action Gold"
+                            value={mapDetailFormData.leastSolvableActionGold}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionGold: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionGold: parseInt(event.target.value) });
-                                }  
+                                }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableActionGold}
                         />
                     </Grid>
                     <Grid item md={4}>
@@ -140,12 +155,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Action Silver"
+                            value={mapDetailFormData.leastSolvableActionSilver}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionSilver: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionSilver: parseInt(event.target.value) });
-                                }  
+                                }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableActionSilver}
                         />
                     </Grid>
                     <Grid item md={4}>
@@ -154,12 +172,15 @@ const MapDetailEditorCard = ({ mapDetailFormData, worlds, loading, setMapDetailF
                             variant="filled"
                             type="text"
                             label="Least Solvable Action Bronze"
+                            value={mapDetailFormData.leastSolvableActionBronze}
+                            onChange={(event) => {
+                                setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionBronze: event.target.value });
+                            }}
                             onBlur={(event) => {
                                 if (event.target.value) {
                                     setMapDetailFormData({ ...mapDetailFormData, leastSolvableActionBronze: parseInt(event.target.value) });
                                 }
                             }}
-                            defaultValue={mapDetailFormData.leastSolvableActionBronze}
                         />
                     </Grid>
 

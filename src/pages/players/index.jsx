@@ -1,10 +1,8 @@
-import { Button, Stack } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, Stack } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header";
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
-import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
-import DataBox from "../../components/DataBox";
 import { usePlayerListQuery, playerListQueryOption } from "../../hooks/usePlayerListQuery";
 
 
@@ -24,17 +22,12 @@ const PlayerList = () => {
         {
             field: "player_id",
             headerName: "ID",
-            flex: 1
+            flex: 3
         },
         {
             field: "email",
             headerName: "Email",
-            flex: 1
-        },
-        {
-            field: "name",
-            headerName: "Name",
-            flex: 1
+            flex: 2
         },
         {
             field: "actions",
@@ -64,39 +57,22 @@ const PlayerList = () => {
         <>
             <Header title="PLAYERS" subtitle="Managing the players" />
 
-            <DataBox
-                title="Player List"
-                sx={{
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: "background.paper",
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        backgroundColor: "background.paper"
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: "background.paper"
-                    },
-                }}
-                contentComponent={
-                    !isLoading ?
-                        (
-                            <DataGrid
-                                rows={players}
-                                columns={columns}
-                                getRowId={(row) => row.player_id}
-                                components={{ Toolbar: GridToolbar }}
-                                sx={{ height: "70vh", border: "none" }}
-                            />) : (
-                            <DataGrid
-                                loading
-                                rows={[]}
-                                columns={columns}
-                                components={{ Toolbar: GridToolbar }}
-                                sx={{ height: "70vh", border: "none" }}
-                            />
-                        )
-                }
-            />
+            <Card>
+                <CardHeader
+                    title="Player List"
+                    sx={{ backgroundColor: "primary.dark" }}
+                />
+                <CardContent>
+                    <DataGrid
+                        loading={isLoading}
+                        rows={!isLoading ? players : []}
+                        columns={columns}
+                        getRowId={(row) => row.player_id}
+                        components={{ Toolbar: GridToolbar }}
+                        sx={{ height: "70vh", border: "none" }}
+                    />
+                </CardContent>
+            </Card>
         </>
     );
 };

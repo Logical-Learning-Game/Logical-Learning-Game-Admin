@@ -1,10 +1,9 @@
-import { Grid, List, ListItem, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
+import { Card, CardContent, CardHeader, Grid, List, ListItem, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { useLocation } from "react-router-dom";
 import { useMemo, useState } from "react";
-import DataBox from "../../components/DataBox";
 import Header from "../../components/Header";
 import { toAdjacencyList, commandDisplay } from "../../utils/command";
 import { ruleDisplay } from "../../utils/rule";
@@ -133,7 +132,7 @@ const SessionInfo = () => {
       ];
     }
     return null;
-  }, [selectedSubmitData]) 
+  }, [selectedSubmitData])
 
   const commandAdjacencyList = useMemo(() => {
     if (selectedSubmitData) {
@@ -155,20 +154,13 @@ const SessionInfo = () => {
       <Grid container spacing={2}>
         <Grid item md={12}>
           {/* Submit Histories */}
-          <DataBox
-            title="Submit Histories"
-            sx={{
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "background.paper",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                backgroundColor: "background.paper"
-              },
-              "& .MuiDataGrid-virtualScroller": {
-                backgroundColor: "background.paper"
-              }
-            }}
-            contentComponent={
+          <Card>
+            <CardHeader
+              title="Submit Histories"
+              sx={{ backgroundColor: "primary.dark" }}
+            />
+            <CardContent
+            >
               <DataGrid
                 rows={state.submit_histories}
                 columns={columns}
@@ -178,16 +170,21 @@ const SessionInfo = () => {
                 onRowSelectionModelChange={handleSelectionChange}
                 sx={{ height: "60vh", border: "none" }}
               />
-            }
-          />
+            </CardContent>
+          </Card>
         </Grid>
         {selectedSubmitData ?
           (<>
             <Grid item md={4}>
               {/* State Value */}
-              <DataBox
-                title="State Value"
-                contentComponent={
+              <Card>
+                <CardHeader
+                  title="State Value"
+                  sx={{ backgroundColor: "primary.dark" }}
+                />
+                <CardContent
+                  sx={{ height: "400px", overflowY: "auto" }}
+                >
                   <Grid container spacing={2}>
                     <Grid item md={6}>
                       <List>
@@ -199,7 +196,7 @@ const SessionInfo = () => {
                                   <Typography noWrap variant="subtitle2" fontWeight="medium">{s.name}: </Typography>
                                   <Typography variant="subtitle2" fontWeight="light">{s.value}</Typography>
                                 </Stack>
-                              }/>
+                              } />
                             </ListItem>
                           ))
                         }
@@ -238,14 +235,19 @@ const SessionInfo = () => {
                       </List>
                     </Grid>
                   </Grid>
-                }
-              />
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item md={4}>
               {/* Rules */}
-              <DataBox
-                title="Rules"
-                contentComponent={
+              <Card>
+                <CardHeader
+                  title="Rules"
+                  sx={{ backgroundColor: "primary.dark" }}
+                />
+                <CardContent
+                  sx={{ height: "400px", overflowY: "auto" }}
+                >
                   <List>
                     {
                       selectedSubmitData.rules.map((r, idx) => (
@@ -261,25 +263,30 @@ const SessionInfo = () => {
                       ))
                     }
                   </List>
-                }
-              />
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item md={4}>
               {/* Commands */}
-              <DataBox
-                title="Commands"
-                contentComponent={
+              <Card>
+                <CardHeader
+                  title="Commands"
+                  sx={{ backgroundColor: "primary.dark" }}
+                />
+                <CardContent
+                  sx={{ height: "400px", overflowY: "auto" }}
+                >
                   <List>
                     {
                       commandAdjacencyList.map((c, idx) => (
                         <ListItem key={idx} disablePadding>
-                          <ListItemText primary={commandDisplay(c, idx)}/>
+                          <ListItemText primary={commandDisplay(c, idx)} />
                         </ListItem>
                       ))
                     }
                   </List>
-                }
-              />
+                </CardContent>
+              </Card>
             </Grid>
           </>) : (<></>)
         }

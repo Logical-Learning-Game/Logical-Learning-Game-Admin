@@ -1,4 +1,4 @@
-import { Box, Card, CardHeader, CardContent, Grid, Stack, MenuItem, Button, Typography, Chip, FormControl, Select, InputLabel } from "@mui/material";
+import { Grid, Stack, Button } from "@mui/material";
 import { useState } from "react";
 import Header from "../../components/Header";
 import { useWorldQuery } from "../../hooks/useWorldQuery";
@@ -11,6 +11,7 @@ import MapEditorCard from "../../components/MapEditorCard";
 import MapObjectsCard from "../../components/MapObjectsCard";
 import * as mapUtil from "../../utils/map";
 import MapAnalyzerCard from "../../components/MapAnalyzerCard";
+import { useNavigate } from "react-router-dom";
 
 
 const MAX_HEIGHT = 9;
@@ -40,6 +41,8 @@ const MIN_WIDTH = 1;
 // });
 
 const MapBuilder = () => {
+  const navigate = useNavigate();
+
   // Query
   const { data: worlds, isLoading } = useWorldQuery();
 
@@ -66,13 +69,13 @@ const MapBuilder = () => {
     worldId: "",
     name: "",
     difficulty: "",
-    starRequirement: undefined,
-    leastSolvableCommandGold: undefined,
-    leastSolvableCommandSilver: undefined,
-    leastSolvableCommandBronze: undefined,
-    leastSolvableActionGold: undefined,
-    leastSolvableActionSilver: undefined,
-    leastSolvableActionBronze: undefined,
+    starRequirement: "",
+    leastSolvableCommandGold: "",
+    leastSolvableCommandSilver: "",
+    leastSolvableCommandBronze: "",
+    leastSolvableActionGold: "",
+    leastSolvableActionSilver: "",
+    leastSolvableActionBronze: "",
     currentFile: undefined,
     previewImage: undefined
   });
@@ -437,6 +440,7 @@ const MapBuilder = () => {
     }
 
     createMapMutation.mutate({ data: formData });
+    navigate("/maps");
   };
 
   return (
@@ -512,7 +516,7 @@ const MapBuilder = () => {
 
       <Stack direction="row" justifyContent="end" spacing={2} mt={2}>
         <Button variant="contained" onClick={handleCreateMapSubmit}>Create</Button>
-        <Button>Cancel</Button>
+        <Button onClick={() => navigate("/maps")}>Cancel</Button>
       </Stack>
 
     </>
