@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../api/httpCommon";
 
-const createWorld = ({data}) => {
+const createWorld = ({ data }) => {
     return apiClient.post("/v1/admin/worlds", data);
 };
 

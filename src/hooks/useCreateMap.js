@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../api/httpCommon";
 
-const createMap = ({data}) => {
+const createMap = ({ data }) => {
     return apiClient.post("/v1/admin/maps", data, {
         headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
         }
     });
 };
@@ -14,7 +14,7 @@ export const useCreateMap = () => {
 
     return useMutation(createMap, {
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ["worldWithMap"]});
+            queryClient.invalidateQueries({ queryKey: ["worldWithMap"] });
         }
     });
 };
