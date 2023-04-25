@@ -576,6 +576,7 @@ const MapEditor = () => {
             mapElements={mapElements}
             height={mapHeight}
             width={mapWidth}
+            onApplyResult={(recommendedValues) => setMapDetailFormData({...mapDetailFormData, ...recommendedValues})}
           />
         </Grid>
       </Grid>

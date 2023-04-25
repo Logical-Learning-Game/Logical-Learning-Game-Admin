@@ -5,7 +5,7 @@ import { commandType, edgeType } from "../enums/command";
 import { toAdjacencyList } from "../utils/command";
 import { commandDisplay } from "../utils/command";
 
-const MapAnalyzerCard = ({ mapElements, height, width }) => {
+const MapAnalyzerCard = ({ mapElements, height, width, onApplyResult }) => {
     const [analyzeResult, setAnalyzeResult] = useState(null);
     const mapAnalyzeMutation = useMapAnalyze();
     const commandAdjacencyList = useMemo(() => {
@@ -140,6 +140,20 @@ const MapAnalyzerCard = ({ mapElements, height, width }) => {
                                     <ListItemText primary={`Least Solvable Action Bronze: ${analyzeResult.leastSolvableActionBronze}`} />
                                 </ListItem>
                             </List>
+
+                            <Button
+                                variant="contained"
+                                onClick={() => onApplyResult({
+                                    leastSolvableCommandGold: analyzeResult.leastSolvableCommandGold,
+                                    leastSolvableCommandSilver: analyzeResult.leastSolvableCommandSilver,
+                                    leastSolvableCommandBronze: analyzeResult.leastSolvableCommandBronze,
+                                    leastSolvableActionGold: analyzeResult.leastSolvableActionGold,
+                                    leastSolvableActionSilver: analyzeResult.leastSolvableActionSilver,
+                                    leastSolvableActionBronze: analyzeResult.leastSolvableActionBronze
+                                })}
+                            >
+                                Apply Recommended Values
+                            </Button>
                         </>
                     </CardContent>
                 ) : (
@@ -155,13 +169,13 @@ const MapAnalyzerCard = ({ mapElements, height, width }) => {
                     >
                         {
                             mapAnalyzeMutation.isLoading ? (
-                                <CircularProgress color="secondary"/>
+                                <CircularProgress color="secondary" />
                             ) : mapAnalyzeMutation.isError ? (
                                 mapAnalyzeMutation.error.code === 204 ? (
                                     <Typography textAlign="center">
                                         Solution not found
                                     </Typography>
-                                ) : mapAnalyzeMutation.error.code === 504 ? (
+                                ) : mapAnalyzeMutation.error.response.status === 504 ? (
                                     <Typography textAlign="center">
                                         Timeout
                                     </Typography>

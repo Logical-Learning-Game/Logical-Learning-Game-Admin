@@ -1,10 +1,11 @@
-import { Box, Card, CardContent, CardHeader, Stack, Button, Typography, Grid, List, ListItem, ListItemText, CardActions, Dialog, DialogTitle, DialogContent, TextField, DialogActions, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Stack, Button, Typography, Grid, List, ListItem, ListItemText, CardActions, Dialog, DialogTitle, DialogContent, TextField, DialogActions, FormControl, InputLabel, Select, MenuItem, DialogContentText } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import VideogameAssetOutlinedIcon from '@mui/icons-material/VideogameAssetOutlined';
 import VideogameAssetOffOutlinedIcon from '@mui/icons-material/VideogameAssetOffOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import { useMemo, useState } from "react";
 import Header from "../../components/Header";
 import { ruleDisplay } from "../../utils/rule";
@@ -15,6 +16,7 @@ import { useWorldWithMapQuery, worldWithMapQueryOption } from "../../hooks/useWo
 import { useSetMapActive } from "../../hooks/useSetMapActive";
 import mapConfig from "../../config/mapConfig";
 import mapPlaceHolder from "../../assets/map_placeholder.png";
+import { useAddMapToAllPlayer } from "../../hooks/useAddMapToAllPlayers";
 
 
 export const loader = (queryClient) => {
@@ -38,6 +40,7 @@ const MapList = () => {
   const [createWorldDialogOpen, setCreateWorldDialogOpen] = useState(false);
   const [createWorldDialogFormData, setCreateWorldDialogFormData] = useState({ name: null });
   const [selectedWorldFilter, setSelectedWorldFilter] = useState("");
+  const [confirmAddMapToAllPlayersDialog, setConfirmAddMapToAllPlayersDialog] = useState({ open: false, map: null });
 
   const [mapSearchFilter, setMapSearchFilter] = useState("");
 
@@ -46,6 +49,7 @@ const MapList = () => {
   const editWorldMutation = useEditWorld();
   const createWorldMutation = useCreateWorld();
   const setMapActiveMutation = useSetMapActive();
+  const addMapToAllPlayersMutation = useAddMapToAllPlayer();
 
   let filteredWorldWithMaps = useMemo(() => {
     if (!isWorldWithMapLoading) {
@@ -110,6 +114,19 @@ const MapList = () => {
 
   const handleMapSearchFilterChange = (event) => {
     setMapSearchFilter(event.target.value);
+  };
+
+  const handleAddMapToAllPlayers = (mapId) => {
+    addMapToAllPlayersMutation.mutate({ mapId });
+  };
+
+  const handleCloseConfirmAddMapToAllPlayerDialog = () => {
+    setConfirmAddMapToAllPlayersDialog({ open: false, map: null })
+  };
+
+  const handleConfirmAddMapToAllPlayerDialog = () => {
+    handleAddMapToAllPlayers(confirmAddMapToAllPlayersDialog.map.map_id);
+    setConfirmAddMapToAllPlayersDialog({ open: false, map: null })
   };
 
   const worldColumns = [
@@ -199,6 +216,28 @@ const MapList = () => {
         <DialogActions>
           <Button onClick={handleCreateWorldDialogClose}>Cancel</Button>
           <Button onClick={handleCreateWorldDialogCreate}>Create</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* CONFIRM ADD MAP TO ALL PLAYERS DIALOG */}
+      <Dialog
+        open={confirmAddMapToAllPlayersDialog.open}
+        onClose={handleCloseConfirmAddMapToAllPlayerDialog}
+        maxWidth="sm"
+      >
+        <DialogTitle>Confirm</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Map {confirmAddMapToAllPlayersDialog.map?.map_name} will assign to all players in the game
+          </DialogContentText>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseConfirmAddMapToAllPlayerDialog}>Cancel</Button>
+          <Button onClick={handleConfirmAddMapToAllPlayerDialog}
+          >
+            Ok
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -398,7 +437,23 @@ const MapList = () => {
                           </Grid>
                         </Grid>
 
-                        <CardActions sx={{ justifyContent: 'flex-end', gap: 2 }}>
+                        <CardActions sx={{ justifyContent: 'flex-end', gap: 1 }}>
+                          <Box
+                            sx={{
+                              position: "relative"
+                            }}
+                          >
+                            <Button
+                              variant="contained"
+                              startIcon={<PeopleAltOutlinedIcon />}
+                              size="small"
+                              color="primary"
+                              onClick={() => setConfirmAddMapToAllPlayersDialog({ open: true, map: map })}
+                              disabled={mapConfig.defaultMap.includes(map.map_id) || !map.active}
+                            >
+                              Add to All Players
+                            </Button>
+                          </Box>
                           <Button
                             component={Link}
                             to={`${map.map_id}/edit`}
