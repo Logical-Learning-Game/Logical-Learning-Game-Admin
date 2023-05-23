@@ -15,6 +15,7 @@ import { mapQueryOption } from "../../hooks/useMapQuery";
 import { makeArray } from "../../utils/map";
 import { useEditMap } from "../../hooks/useEditMap";
 import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "../../hooks/useAuth";
 
 const transformTile = (tile, height, width) => {
   const mapHeight = height;
@@ -85,10 +86,11 @@ const MapEditor = () => {
   // Query
   const { data: worlds, isLoading } = useWorldQuery();
   const queryClient = useQueryClient();
+  const { token } = useAuth();
 
   useEffect(() => {
     (async () => {
-      const query = mapQueryOption(mapId);
+      const query = mapQueryOption(token, mapId);
       const data = await queryClient.ensureQueryData(query);
 
       const mapData = {
@@ -129,7 +131,7 @@ const MapEditor = () => {
       setPlayerData(playerData);
       setRules(rulesData);
     })();
-  }, [mapId, queryClient])
+  }, [mapId, queryClient, token])
 
   // Mutation
   const editMapMutation = useEditMap();
@@ -574,6 +576,7 @@ const MapEditor = () => {
             mapElements={mapElements}
             height={mapHeight}
             width={mapWidth}
+            onApplyResult={(recommendedValues) => setMapDetailFormData({...mapDetailFormData, ...recommendedValues})}
           />
         </Grid>
       </Grid>

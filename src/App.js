@@ -63,6 +63,10 @@ const App = () => {
                   path="maps/build"
                   element={<MapBuilder />}
                 />
+                <Route
+                  index
+                  element={<PlayerList/>}
+                />
               </Route>
             </Routes>
           )
